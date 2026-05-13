@@ -1,12 +1,10 @@
 package com.marketplace.ms_user.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,14 +12,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+@RequiredArgsConstructor // Esto inyecta JwtUtil automáticamente
+public class JwtFilter extends OncePerRequestFilter {
 
-    // EXACTAMENTE la misma que en JwtService
-    private final String SECRET_KEY = "esta_es_una_clave_secreta_muy_larga_y_segura_1234567890";
+    private final JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -32,19 +29,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
-            try {
-                Claims claims = Jwts.parserBuilder()
-                        .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
-                        .build()
-                        .parseClaimsJws(token)
-                        .getBody();
-
-                String username = claims.getSubject();
-                String role = claims.get("role", String.class);
+            // Usamos JwtUtil para validar y extraer datos
+            if (jwtUtil.esValido(token)) {
+                String username = jwtUtil.obtenerUsuario(token);
+                String role = jwtUtil.obtenerRole(token);
 
                 if (username != null && role != null) {
-                    // Si el rol ya viene con "ROLE_", no lo dupliques.
-                    // Si viene como "ADMIN", aquí lo convertimos en "ROLE_ADMIN"
+                    // Normalizamos el rol a "ROLE_NOMBRE"
                     String formattedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
 
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
@@ -54,8 +45,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
-
-            } catch (Exception e) {
+            } else {
+                // Si el token no es válido, nos aseguramos de limpiar el contexto
                 SecurityContextHolder.clearContext();
             }
         }

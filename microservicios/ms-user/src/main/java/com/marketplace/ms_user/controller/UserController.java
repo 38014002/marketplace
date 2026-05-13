@@ -5,7 +5,7 @@ import com.marketplace.ms_user.dto.LoginDto;
 import com.marketplace.ms_user.dto.UserRegistrationDto;
 import com.marketplace.ms_user.model.User;
 import com.marketplace.ms_user.service.UserService;
-import com.marketplace.ms_user.security.JwtService;
+import com.marketplace.ms_user.security.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final JwtService jwtService;
+    private final JwtUtil jwtService;
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping
