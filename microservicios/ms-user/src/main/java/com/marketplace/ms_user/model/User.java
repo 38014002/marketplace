@@ -1,5 +1,6 @@
 package com.marketplace.ms_user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // Importante
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +19,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @JsonIgnore // Con esto, el password nunca saldrá en los JSON de respuesta
     @Column(nullable = false)
     private String password;
 
@@ -25,5 +27,5 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String role; // Ejemplo: "ROLE_USER", "ROLE_ADMIN"
+    private String role;
 }
