@@ -8,7 +8,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     @Bean
-    public WebClient inventoryWebClient(WebClient.Builder builder) {
-        return builder.baseUrl("http://localhost:8084/api/inventory").build();
+    public WebClient inventoryWebClient() {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8084/api/inventario") // <--- Debe decir "inventario"
+                .build();
     }
 }
