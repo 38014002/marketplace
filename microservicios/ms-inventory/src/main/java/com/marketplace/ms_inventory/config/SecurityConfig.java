@@ -1,6 +1,6 @@
 package com.marketplace.ms_inventory.config;
 
-import com.marketplace.ms_inventory.security.JwtAuthenticationFilter;
+import com.marketplace.ms_inventory.security.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,10 +15,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtFilter;
+    private final JwtFilter jwtFilter;
 
     // Constructor para inyección de dependencias
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+    public SecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
 
