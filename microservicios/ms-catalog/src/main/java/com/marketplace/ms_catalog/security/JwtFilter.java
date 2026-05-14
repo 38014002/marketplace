@@ -16,10 +16,10 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Component
-@RequiredArgsConstructor // Esto inyecta el JwtService automáticamente
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+@RequiredArgsConstructor
+public class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtUtil jwtUtil; // Cambiado a jwtUtil para consistencia
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -31,13 +31,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
 
             try {
-                // Usamos el servicio para extraer los datos
-                Claims claims = jwtService.extraerTodoElContenido(token);
+                // Usamos el servicio centralizado para extraer los datos
+                Claims claims = jwtUtil.extraerTodoElContenido(token);
                 String username = claims.getSubject();
                 String role = claims.get("role", String.class);
 
                 if (username != null && role != null) {
-                    // Normalizamos el rol para Spring Security
+                    // Normalizamos el rol para que Spring Security lo reconozca
                     String roleWithPrefix = role.startsWith("ROLE_") ? role : "ROLE_" + role;
 
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
@@ -49,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
             } catch (Exception e) {
-                // Si el token es inválido, limpiamos el contexto para denegar el acceso
+                // Si el token es inválido, expiró o la firma no coincide, limpiamos el contexto
                 SecurityContextHolder.clearContext();
             }
         }
