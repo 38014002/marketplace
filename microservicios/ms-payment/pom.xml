@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>ms-producto</artifactId>
+	<artifactId>ms-payment</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ms-producto</name>
-	<description>ms-producto</description>
+	<name>ms-payment</name>
+	<description/>
 	<url/>
 	<licenses>
 		<license/>
