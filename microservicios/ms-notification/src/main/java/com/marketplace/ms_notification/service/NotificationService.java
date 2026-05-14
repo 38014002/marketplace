@@ -1,5 +1,6 @@
 package com.marketplace.ms_notification.service;
 
+import com.marketplace.ms_notification.dto.NotificationRequest;
 import com.marketplace.ms_notification.model.Notification;
 import com.marketplace.ms_notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,15 +12,24 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationService {
+
     private final NotificationRepository repository;
 
-    public Notification saveAndSend(Notification notification) {
-        log.info("Enviando notificación tipo {} al usuario {}: {}",
-                notification.getType(), notification.getUserId(), notification.getMessage());
+    // Cambiamos el parámetro de Notification a NotificationRequest
+    public Notification saveAndSend(NotificationRequest request) {
+        log.info("Creando notificación para usuario ID: {} del tipo {}", request.getUserId(), request.getType());
+
+        Notification notification = new Notification();
+        notification.setUserId(request.getUserId());
+        notification.setMessage(request.getMessage());
+        notification.setType(request.getType());
+        // createdAt se setea solo en la entidad según tu código
+
         return repository.save(notification);
     }
 
     public List<Notification> getHistoryByUserId(Long userId) {
+        log.debug("Buscando historial para el usuario {}", userId);
         return repository.findByUserId(userId);
     }
 }
