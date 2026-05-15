@@ -1,16 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
-    <!-- Console JSON -->
     <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
 
-    <!-- File JSON -->
     <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/auth-service.json</file>
+        <file>logs/ms-auth.json</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/auth-service-%d{yyyy-MM-dd}.json</fileNamePattern>
+            <fileNamePattern>logs/ms-auth-%d{yyyy-MM-dd}.json</fileNamePattern>
             <maxHistory>7</maxHistory>
         </rollingPolicy>
 
@@ -22,4 +20,5 @@
         <appender-ref ref="JSON_FILE"/>
     </root>
 
+    <logger name="com.marketplace.ms_user" level="DEBUG"/>
 </configuration>
