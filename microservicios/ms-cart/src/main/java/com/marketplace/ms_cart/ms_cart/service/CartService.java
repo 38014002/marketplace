@@ -88,4 +88,9 @@ public class CartService {
 
         return repository.findByUserId(userId);
     }
+
+    public List<Cart> getCartByUser(Long userId) {
+        log.info("Obteniendo carrito para usuario {}", userId);
+        return repository.findByUserId(userId);
+    }
 }
