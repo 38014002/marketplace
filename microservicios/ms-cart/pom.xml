@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>ms-search</artifactId>
+	<artifactId>ms-cart</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ms-search</name>
-	<description>ms-search</description>
+	<name>ms-cart</name>
+	<description>ms-cart</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -110,10 +110,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 	</dependencies>
 
