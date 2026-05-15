@@ -1,5 +1,6 @@
 package com.marketplace.ms_notification.controller;
 
+import com.marketplace.ms_notification.dto.ApiResponse;
 import com.marketplace.ms_notification.dto.NotificationRequest;
 import com.marketplace.ms_notification.model.Notification;
 import com.marketplace.ms_notification.service.NotificationService;
@@ -20,15 +21,17 @@ public class NotificationController {
     private final NotificationService service;
 
     @PostMapping
-    public ResponseEntity<Notification> send(@Valid @RequestBody NotificationRequest request) {
+    public ResponseEntity<ApiResponse<Notification>> send(@Valid @RequestBody NotificationRequest request) {
         log.info("Recibida petición de notificación para el usuario: {}", request.getUserId());
-        // El service se encargará de convertir el DTO a Entity antes de guardar
-        return ResponseEntity.ok(service.saveAndSend(request));
+        Notification saved = service.saveAndSend(request);
+        // Usamos el ApiResponse que creamos para que el JSON sea más profesional
+        return ResponseEntity.ok(ApiResponse.success("Notificación procesada correctamente", saved));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Notification>> getHistory(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<List<Notification>>> getHistory(@PathVariable Long userId) {
         log.debug("Consultando historial para usuario ID: {}", userId);
-        return ResponseEntity.ok(service.getHistoryByUserId(userId));
+        List<Notification> history = service.getHistoryByUserId(userId);
+        return ResponseEntity.ok(ApiResponse.success("Historial recuperado", history));
     }
 }
