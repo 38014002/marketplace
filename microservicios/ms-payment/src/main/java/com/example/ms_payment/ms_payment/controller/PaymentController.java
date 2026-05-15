@@ -52,4 +52,9 @@ public class PaymentController {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/process/{orderId}")
+    public ResponseEntity<String> processPayment(@PathVariable Long orderId) {
+        return ResponseEntity.ok("APPROVED");
+    }
 }
