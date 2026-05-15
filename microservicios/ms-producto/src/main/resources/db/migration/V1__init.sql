@@ -1,13 +1,15 @@
--- Crear tabla productos
-CREATE TABLE IF NOT EXISTS productos (
-  id_producto INT AUTO_INCREMENT PRIMARY KEY,
-  nombre VARCHAR(255) NOT NULL,
-  precio DECIMAL(10,2) NOT NULL,
-  stock INT NOT NULL
+-- Borramos rastro de intentos anteriores
+DROP TABLE IF EXISTS products;
+
+CREATE TABLE products (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    category VARCHAR(100) NOT NULL
 );
 
--- Insertar datos de prueba
-INSERT INTO productos (nombre, precio, stock) VALUES
-('Laptop Gamer', 1200.00, 10),
-('Mouse Inalámbrico', 25.50, 50),
-('Teclado Mecánico', 75.00, 30);
+-- Insertamos datos que SI coinciden con tu modelo Java
+INSERT INTO products (name, description, price, category) VALUES
+('Laptop Gamer', 'Potente laptop con RTX 4060', 1200.00, 'Computación'),
+('Mouse RGB', 'Mouse óptico 12000 DPI', 45.50, 'Accesorios');

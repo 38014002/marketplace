@@ -16,10 +16,10 @@ import lombok.RequiredArgsConstructor;
 public class SearchController {
 
     private final SearchService service;
-    @GetMapping
-    public ResponseEntity<List<ProductResponseDto>>
-    buscar(@RequestParam String query) {
 
-    return ResponseEntity.ok(service.buscar(query));
+    @GetMapping
+    public ResponseEntity<List<ProductResponseDto>> buscar(@RequestParam String query) {
+
+        return ResponseEntity.ok(service.buscar(query));
     }
 }

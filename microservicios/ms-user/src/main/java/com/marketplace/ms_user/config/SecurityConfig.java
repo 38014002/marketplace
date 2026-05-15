@@ -22,14 +22,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Desactivamos CSRF porque usamos JWT
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/usuarios/login", "/api/usuarios").permitAll() // Endpoints públicos
-                        .anyRequest().authenticated() // Todo lo demás requiere Token
-                )
+                        // Agregamos "/api/usuarios/validate/**" para que ms-auth pueda entrar
+                        .requestMatchers("/api/usuarios/login", "/api/usuarios", "/api/usuarios/validate/**")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Sin estado (Stateless)
-                )
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

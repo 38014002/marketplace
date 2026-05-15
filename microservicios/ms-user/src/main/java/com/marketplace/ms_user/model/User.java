@@ -1,6 +1,5 @@
 package com.marketplace.ms_user.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // Importante
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,14 +13,13 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
-    private Integer id;
+    private Integer id; // 🚩 Fíjate: Es Integer
 
     @Column(nullable = false, unique = true)
     private String username;
 
-    @JsonIgnore // Con esto, el password nunca saldrá en los JSON de respuesta
     @Column(nullable = false)
-    private String password;
+    private String password; // 🚩 Sin anotaciones de Jackson para que viaje siempre
 
     @Column(nullable = false, unique = true)
     private String email;
