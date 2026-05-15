@@ -1,0 +1,7 @@
+CREATE TABLE notifications (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    message VARCHAR(255) NOT NULL,
+    type VARCHAR(50),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

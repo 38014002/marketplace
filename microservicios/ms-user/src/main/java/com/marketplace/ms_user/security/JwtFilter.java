@@ -1,6 +1,5 @@
-package com.marketplace.ms_catalog.security;
+package com.marketplace.ms_user.security;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,10 +15,10 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Component
-@RequiredArgsConstructor // Esto inyecta el JwtService automáticamente
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+@RequiredArgsConstructor // Esto inyecta JwtUtil automáticamente
+public class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -30,26 +29,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
-            try {
-                // Usamos el servicio para extraer los datos
-                Claims claims = jwtService.extraerTodoElContenido(token);
-                String username = claims.getSubject();
-                String role = claims.get("role", String.class);
+            // Usamos JwtUtil para validar y extraer datos
+            if (jwtUtil.esValido(token)) {
+                String username = jwtUtil.obtenerUsuario(token);
+                String role = jwtUtil.obtenerRole(token);
 
                 if (username != null && role != null) {
-                    // Normalizamos el rol para Spring Security
-                    String roleWithPrefix = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                    // Normalizamos el rol a "ROLE_NOMBRE"
+                    String formattedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
 
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                             username,
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority(roleWithPrefix)));
+                            Collections.singletonList(new SimpleGrantedAuthority(formattedRole)));
 
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
-
-            } catch (Exception e) {
-                // Si el token es inválido, limpiamos el contexto para denegar el acceso
+            } else {
+                // Si el token no es válido, nos aseguramos de limpiar el contexto
                 SecurityContextHolder.clearContext();
             }
         }
