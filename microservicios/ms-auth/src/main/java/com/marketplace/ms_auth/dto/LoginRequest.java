@@ -1,14 +1,13 @@
-package com.example.ms_auth.dto;
+package com.marketplace.ms_auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class LoginRequest {
-
-    @NotBlank(message = "Username es obligatorio")
+    @NotBlank(message = "El usuario es obligatorio")
     private String username;
 
-    @NotBlank(message = "Password es obligatorio")
+    @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 }
