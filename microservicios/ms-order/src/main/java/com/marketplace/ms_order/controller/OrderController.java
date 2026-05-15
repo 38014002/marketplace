@@ -29,4 +29,9 @@ public class OrderController {
     public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(orderService.getOrdersByUser(userId));
     }
+
+    @PostMapping("/checkout/{userId}")
+    public ResponseEntity<Order> checkout(@PathVariable Long userId) {
+        return ResponseEntity.ok(orderService.checkout(userId));
+    }
 }
