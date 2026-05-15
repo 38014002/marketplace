@@ -4,13 +4,17 @@ import com.marketplace.ms_catalog.dto.StockDto;
 import com.marketplace.ms_catalog.exception.RecursoNoEncontradoException;
 import com.marketplace.ms_catalog.model.Product;
 import com.marketplace.ms_catalog.repository.ProductRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -48,19 +52,26 @@ public class ProductService {
             response.put("precio", producto.getPrice());
             response.put("categoria", producto.getCategory());
 
-            // Consulta síncrona a ms-inventory
+            // --- PROPAGACIÓN DEL TOKEN JWT ---
+            // Extraemos el token que vino en la petición original para dárselo al
+            // Inventario
+            String token = getJwtTokenFromRequest();
+
             try {
                 StockDto stockInfo = inventoryWebClient.get()
                         .uri("/{productId}", id)
+                        .header("Authorization", "Bearer " + token) // Le pasamos "la llave" al inventario
                         .retrieve()
                         .bodyToMono(StockDto.class)
-                        .block(); // Esperamos el resultado porque es necesario para la respuesta
+                        .block();
 
                 response.put("stockActual", stockInfo != null ? stockInfo.getStock() : 0);
                 response.put("disponible", stockInfo != null && stockInfo.getStock() > 0);
+
             } catch (Exception e) {
                 log.error("Error conectando con ms-inventory: {}", e.getMessage());
-                response.put("info_inventario", "Servicio de stock no disponible actualmente");
+                response.put("info_inventario",
+                        "No se pudo obtener el stock (Servicio no disponible o error de permisos)");
             }
         }
 
@@ -68,29 +79,58 @@ public class ProductService {
     }
 
     /**
+     * Extrae el token JWT de la petición actual
+     */
+    private String getJwtTokenFromRequest() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                return authHeader.substring(7);
+            }
+        }
+        return null;
+    }
+
+    /**
      * Crea un producto y gatilla la sincronización con el microservicio de búsqueda
      */
     public Product crearProducto(Product producto) {
-        // Guardar en la base de datos local (ms-catalog)
         Product nuevoProducto = productRepository.save(producto);
-
-        // Sincronizar con ms-search (Asíncrono para no bloquear la creación)
         sincronizarConSearch(nuevoProducto);
-
         return nuevoProducto;
     }
 
     /**
-     * Método privado para enviar los datos a ms-search vía POST
+     * Método para enviar los datos a ms-search vía POST
      */
     private void sincronizarConSearch(Product producto) {
         searchWebClient.post()
-                .uri("/sync") // Ajustar según el endpoint de tu compañero en ms-search
+                .uri("/sync")
                 .bodyValue(producto)
                 .retrieve()
                 .bodyToMono(Void.class)
                 .subscribe(
-                        result -> log.info("✅ Producto {} sincronizado con ms-search exitosamente", producto.getId()),
+                        result -> log.info("✅ Producto {} sincronizado con ms-search", producto.getId()),
                         error -> log.error("❌ Error al sincronizar con ms-search: {}", error.getMessage()));
+    }
+
+    /**
+     * Retorna la lista completa de productos para el Catálogo General
+     */
+    public List<Product> listarTodos() {
+        log.info("Consultando catálogo completo de productos.");
+        return productRepository.findAll();
+    }
+
+    /**
+     * Guarda o actualiza un producto
+     */
+    public Product guardar(Product producto) {
+        Product guardado = productRepository.save(producto);
+        log.info("Producto {} guardado. Sincronizando...", guardado.getName());
+        sincronizarConSearch(guardado);
+        return guardado;
     }
 }

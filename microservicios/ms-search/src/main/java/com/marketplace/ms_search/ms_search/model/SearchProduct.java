@@ -11,9 +11,9 @@ import lombok.*;
 @Builder
 public class SearchProduct {
     @Id
-    private Long id; // Este id viene del microservicio de Producto
-    private String nombre;
-    private String descripcion;
-    private Double precio;
-    private String categoria;
+    private Long id;
+    private String name;
+    private String description;
+    private Double price;
+    private String category;
 }

@@ -11,19 +11,17 @@ public class WebClientConfig {
     @Bean
     public WebClient searchWebClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:8083/api/search") // Puerto sugerido para Search
+                .baseUrl("http://localhost:8089/api/search")
                 .build();
     }
 
     // Cliente para comunicarse con ms-inventory (Verificar stock)
+    // DENTRO DE MS-CATALOG (8082)
     @Bean
-    public WebClient inventoryWebClient() {
+    public WebClient inventoryWebClient() { // El nombre del método es el ID del Bean
         return WebClient.builder()
-                .baseUrl("http://localhost:8084/api/inventory")
+                .baseUrl("http://localhost:8084/api/inventory") // Apunta al otro micro
                 .build();
     }
 
-    // Nota: El "catalogWebClient" aquí dentro no es necesario
-    // porque estamos DENTRO de ms-catalog.
-    // Pero si este archivo es de ms-order, entonces sí déjalo.
 }

@@ -1,6 +1,6 @@
 package com.marketplace.ms_catalog.config;
 
-import com.marketplace.ms_catalog.security.JwtFilter; // Asegúrate de que el filtro esté en este paquete
+import com.marketplace.ms_catalog.security.JwtFilter; 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

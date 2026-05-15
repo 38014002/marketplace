@@ -31,4 +31,5 @@ public class SearchController {
         service.guardarProductoParaBusqueda(producto);
         return ResponseEntity.ok("✅ Producto recibido y sincronizado correctamente");
     }
+
 }
