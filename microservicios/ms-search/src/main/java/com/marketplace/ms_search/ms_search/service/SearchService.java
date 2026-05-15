@@ -39,16 +39,13 @@ public class SearchService {
         log.info("✅ Producto '{}' guardado en el índice de búsqueda.", product.getNombre());
     }
 
-    /**
-     * Método auxiliar para convertir la Entidad al DTO que espera el Controller
-     */
     private ProductResponseDto convertToDto(SearchProduct product) {
         return ProductResponseDto.builder()
-                .id(product.getId())
-                .nombre(product.getNombre())
-                .descripcion(product.getDescripcion())
-                .precio(product.getPrecio())
-                .categoria(product.getCategoria())
+
+                .name(product.getNombre()) // .name() porque así está en el DTO
+                .description(product.getDescripcion()) // .description() en el DTO
+                .price(java.math.BigDecimal.valueOf(product.getPrecio())) // Conversión de Double a BigDecimal
+                .category(product.getCategoria()) // .category() en el DTO
                 .build();
     }
 }

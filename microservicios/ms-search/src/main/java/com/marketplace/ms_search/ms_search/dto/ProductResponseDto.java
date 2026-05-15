@@ -1,17 +1,21 @@
 package com.marketplace.ms_search.ms_search.dto;
 
 import java.math.BigDecimal;
+
+// Estos son los imports que te faltan y por eso te marca error en rojo
 import lombok.Data;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Data
-@Builder // <--- Esta es clave
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class ProductResponseDto {
-    private Long id;
-    private String name; // Coincide con Product.name
-    private String description; // Coincide con Product.description
-    private BigDecimal price; // Coincide con Product.price
-    private String category; // Coincide con Product.category
+    // Borra la línea: private Long id;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private String category;
 }
