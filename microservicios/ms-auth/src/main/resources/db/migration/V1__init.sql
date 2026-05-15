@@ -1,6 +1,0 @@
-CREATE TABLE refresh_tokens (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    token VARCHAR(255) NOT NULL UNIQUE,
-    username VARCHAR(255) NOT NULL,
-    expiry_date DATETIME NOT NULL
-);
