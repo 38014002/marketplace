@@ -6,13 +6,14 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Service
 public class JwtUtil {
 
-    private final Key key;
+    private final SecretKey key;
 
     // Inyectamos la clave desde application.properties
     public JwtUtil(@Value("${jwt.secret}") String secret) {
@@ -22,7 +23,6 @@ public class JwtUtil {
 
     /**
      * Extrae todos los datos (claims) del token.
-     * Si el token es inválido o expiró, este método lanzará una excepción.
      */
     public Claims extraerTodoElContenido(String token) {
         return Jwts.parserBuilder()
@@ -30,5 +30,20 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    /**
+     * Extrae el nombre de usuario (subject) del token
+     */
+    public String extraerUsername(String token) {
+        return extraerTodoElContenido(token).getSubject();
+    }
+
+    /**
+     * Extrae la lista de roles del token.
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> extraerRoles(String token) {
+        return extraerTodoElContenido(token).get("roles", List.class);
     }
 }

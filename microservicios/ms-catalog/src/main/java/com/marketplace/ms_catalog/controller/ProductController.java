@@ -1,39 +1,57 @@
 package com.marketplace.ms_catalog.controller;
 
+import com.marketplace.ms_catalog.dto.ApiResponse;
+import com.marketplace.ms_catalog.dto.ProductRequestDTO;
 import com.marketplace.ms_catalog.model.Product;
 import com.marketplace.ms_catalog.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/catalog")
+@RequestMapping("/api/V1/catalog")
 @RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
 
-    // --- NUEVO: ENDPOINT PARA EL CATÁLOGO (Vista General) ---
+    // --- PÚBLICO: Cualquier usuario puede ver la lista ---
     @GetMapping
     public ResponseEntity<List<Product>> obtenerTodos() {
-        // Llama al service para traer la lista de la DB de Catalog
         return ResponseEntity.ok(productService.listarTodos());
     }
 
-    // --- EL QUE YA TENÍAS: DETALLE DEL PRODUCTO ---
+    // --- PÚBLICO: Cualquier usuario puede ver el detalle usando tu ApiResponse ---
     @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> obtenerDetalle(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> obtenerDetalle(@PathVariable Long id) {
         return ResponseEntity.ok(productService.obtenerProductoConStockCompleto(id));
     }
-    // ... otros métodos (GET)
 
-    @PostMapping // <-- Faltaba este endpoint
-    public ResponseEntity<Product> crear(@RequestBody Product producto) {
-        // Al llamar a crearProducto, se dispara automáticamente la sincronización con
-        // Search
-        return ResponseEntity.status(201).body(productService.crearProducto(producto));
+    // --- RESTRINGIDO: Solo ADMIN puede crear usando el DTO validado ---
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Product> crear(@Valid @RequestBody ProductRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.crearProducto(dto));
+    }
+
+    // --- RESTRINGIDO: Solo ADMIN puede modificar usando el DTO validado ---
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Product> actualizar(@PathVariable Long id, @Valid @RequestBody ProductRequestDTO dto) {
+        return ResponseEntity.ok(productService.actualizarProducto(id, dto));
+    }
+
+    // --- RESTRINGIDO: Solo ADMIN puede eliminar ---
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        productService.eliminarProducto(id);
+        return ResponseEntity.noContent().build();
     }
 }

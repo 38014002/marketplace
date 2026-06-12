@@ -1,11 +1,11 @@
 package com.marketplace.ms_catalog.security;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,13 +13,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil; // Cambiado a jwtUtil para consistencia
+    private final JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -31,25 +34,45 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
 
             try {
-                // Usamos el servicio centralizado para extraer los datos
-                Claims claims = jwtUtil.extraerTodoElContenido(token);
-                String username = claims.getSubject();
-                String role = claims.get("role", String.class);
+                // 1. Extraer el nombre de usuario de forma directa
+                String username = jwtUtil.extraerUsername(token);
 
-                if (username != null && role != null) {
-                    // Normalizamos el rol para que Spring Security lo reconozca
-                    String roleWithPrefix = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
+                    // 2. Extraer roles de forma segura (soportando listas o strings individuales)
+                    List<String> rawRoles = new ArrayList<>();
+                    try {
+                        Object rolesClaim = jwtUtil.extraerTodoElContenido(token).get("roles");
+                        if (rolesClaim instanceof List) {
+                            rawRoles = (List<String>) rolesClaim;
+                        } else if (rolesClaim instanceof String) {
+                            rawRoles.add((String) rolesClaim);
+                        }
+                    } catch (Exception e) {
+                        log.warn("No se pudieron parsear los roles del token, se intentará con el claim 'role'");
+                        String singleRole = jwtUtil.extraerTodoElContenido(token).get("role", String.class);
+                        if (singleRole != null)
+                            rawRoles.add(singleRole);
+                    }
+
+                    // 3. Normalizar todos los roles agregando el prefijo ROLE_ si no lo tienen
+                    List<SimpleGrantedAuthority> authorities = rawRoles.stream()
+                            .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
+                            .map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toList());
+
+                    // 4. Autenticar al usuario en el contexto de Spring Security
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                             username,
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority(roleWithPrefix)));
+                            authorities);
 
                     SecurityContextHolder.getContext().setAuthentication(auth);
+                    log.info("Usuario {} autenticado con éxito en ms-catalog. Roles: {}", username, authorities);
                 }
 
             } catch (Exception e) {
-                // Si el token es inválido, expiró o la firma no coincide, limpiamos el contexto
+                log.error("Error al procesar el token JWT: {}", e.getMessage());
                 SecurityContextHolder.clearContext();
             }
         }
