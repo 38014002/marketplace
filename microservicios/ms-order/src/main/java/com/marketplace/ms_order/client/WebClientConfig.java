@@ -7,27 +7,41 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    // Cliente para comunicarse con el Inventario (Puerto 8084)
+    // Cambiamos los puertos individuales por la ruta unificada del API Gateway
+    // (puerto 8080)
+
+    @Bean
+    public WebClient cartWebClient() {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8080/api/cart")
+                .build();
+    }
+
+    @Bean
+    public WebClient paymentWebClient() {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8080/api/payments")
+                .build();
+    }
+
     @Bean
     public WebClient inventoryWebClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:8084/api/inventario")
+                .baseUrl("http://localhost:8080/api/inventario")
                 .build();
     }
 
-    // Cliente para comunicarse con el Catálogo (Puerto 8082)
     @Bean
     public WebClient catalogWebClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:8082/api/catalog")
+                .baseUrl("http://localhost:8080/api/catalog")
                 .build();
     }
 
-    // Cliente para enviar notificaciones de compra (Puerto 8086)
     @Bean
     public WebClient notificationWebClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:8086/api/notifications")
+                .baseUrl("http://localhost:8080/api/notifications")
                 .build();
     }
 }

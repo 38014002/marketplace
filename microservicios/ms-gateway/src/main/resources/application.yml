@@ -1,0 +1,74 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: ms-gateway
+  
+  cloud:
+    gateway:
+      routes:
+        # 1. Ruta para ms-user
+        - id: ms-user
+          uri: lb://ms-user
+          predicates:
+            - Path=/api/usuarios/**
+
+        # 2. Ruta para ms-producto
+        - id: ms-producto
+          uri: lb://ms-producto
+          predicates:
+            - Path=/api/productos/**
+
+        # 3. Ruta para ms-order
+        - id: ms-order
+          uri: lb://ms-order
+          predicates:
+            - Path=/api/orders/**
+
+        # 4. Ruta para ms-payment
+        - id: ms-payment
+          uri: lb://ms-payment
+          predicates:
+            - Path=/api/payments/**
+
+        # 5. Ruta para ms-notification
+        - id: ms-notification
+          uri: lb://ms-notification
+          predicates:
+            - Path=/api/notifications/**
+
+        # 6. Ruta para ms-search
+        - id: ms-search
+          uri: lb://ms-search
+          predicates:
+            - Path=/api/search/**
+
+        # 7. Ruta para ms-cart
+        - id: ms-cart
+          uri: lb://ms-cart
+          predicates:
+            - Path=/api/cart/**
+
+        # 8. Ruta para ms-catalog
+        - id: ms-catalog
+          uri: lb://ms-catalog
+          predicates:
+            - Path=/api/catalog/**
+
+        # 9. Ruta para ms-auth
+        - id: ms-auth
+          uri: lb://ms-auth
+          predicates:
+            - Path=/auth/**
+
+        # 10. Ruta para ms-inventory (Corregido nombre e índice)
+        - id: ms-inventory
+          uri: lb://ms-inventory
+          predicates:
+            - Path=/api/inventory/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/

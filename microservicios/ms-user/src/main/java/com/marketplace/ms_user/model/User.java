@@ -13,13 +13,13 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
-    private Integer id; // 🚩 Fíjate: Es Integer
+    private Integer id;
 
     @Column(nullable = false, unique = true)
     private String username;
 
     @Column(nullable = false)
-    private String password; // 🚩 Sin anotaciones de Jackson para que viaje siempre
+    private String password;
 
     @Column(nullable = false, unique = true)
     private String email;

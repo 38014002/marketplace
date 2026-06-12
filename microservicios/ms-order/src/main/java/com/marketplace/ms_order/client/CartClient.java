@@ -1,7 +1,7 @@
 package com.marketplace.ms_order.client;
 
 import com.marketplace.ms_order.dto.CartItemDto;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -9,18 +9,21 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class CartClient {
 
     private final WebClient webClient;
 
-    public List<CartItemDto> getCartByUser(Long userId) {
+    public CartClient(@Qualifier("cartWebClient") WebClient webClient) {
+        this.webClient = webClient;
+    }
 
+    public List<CartItemDto> getCartByUser(Long userId) {
         return webClient
                 .get()
-                .uri("http://localhost:8082/api/cart/user/" + userId)
+                .uri("/user/" + userId) // Se acopla a: http://localhost:8080/api/cart/user/{id}
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<CartItemDto>>() {})
+                .bodyToMono(new ParameterizedTypeReference<List<CartItemDto>>() {
+                })
                 .block();
     }
 }

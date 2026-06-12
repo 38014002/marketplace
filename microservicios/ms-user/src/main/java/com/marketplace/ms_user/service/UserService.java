@@ -39,6 +39,23 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    // === NUEVO MÉTODO: ACTUALIZAR ===
+    @Transactional
+    public User actualizar(Integer id, UserRegistrationDto dto) {
+        User userExistente = buscarPorId(id);
+
+        userExistente.setUsername(dto.getUsername());
+        userExistente.setEmail(dto.getEmail());
+        userExistente.setRole(dto.getRole());
+
+        // Solo re-encriptamos la contraseña si viene con información
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            userExistente.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        return userRepository.save(userExistente);
+    }
+
     @Transactional
     public void eliminar(Integer id) {
         User user = buscarPorId(id);
@@ -50,4 +67,5 @@ public class UserService {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado: " + username));
     }
+
 }
