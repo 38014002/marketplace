@@ -1,4 +1,4 @@
-package com.marketplace.ms_order.config;
+package com.marketplace.ms_cart.ms_cart.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -17,10 +17,10 @@ public class OpenApiConfig {
         final String securitySchemeName = "bearerAuth";
         return new OpenAPI()
                 .info(new Info()
-                        .title("API de Gestión de Órdenes (ms-order)")
+                        .title("API de Carrito de Compras (ms-cart)")
                         .version("1.0.0")
                         .description(
-                                "Endpoints encargados de la creación de órdenes, procesamiento de checkouts e histórico transaccional de compras."))
+                                "Endpoints dedicados a la persistencia temporal de ítems seleccionados por el usuario, cantidades y limpieza pre-checkout."))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName, new SecurityScheme()
@@ -29,13 +29,13 @@ public class OpenApiConfig {
                                 .scheme("bearer")
                                 .bearerFormat("JWT")
                                 .description(
-                                        "Inserta el token JWT obtenido en ms-auth para consumir los endpoints privados.")));
+                                        "Inserta el token JWT para gestionar el carrito del usuario autenticado.")));
     }
 
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
-                .group("ms-order")
+                .group("ms-cart")
                 .pathsToMatch("/api/**")
                 .build();
     }
