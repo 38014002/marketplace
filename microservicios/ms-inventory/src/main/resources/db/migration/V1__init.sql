@@ -1,6 +1,6 @@
 CREATE TABLE inventory (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    productId INT NOT NULL UNIQUE,
+    product_id INT NOT NULL UNIQUE,
     stock INT NOT NULL DEFAULT 0
 );
 

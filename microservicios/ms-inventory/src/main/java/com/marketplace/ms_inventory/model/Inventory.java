@@ -8,7 +8,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder // Añadido para que el Service pueda crear objetos fácilmente
 public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
