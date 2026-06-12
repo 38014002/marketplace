@@ -1,24 +1,37 @@
 package com.marketplace.product_service.dto;
 
-import jakarta.validation.constraints.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ProductoDto {
-     @NotBlank(message = "El nombre es obligatorio")
-    private String nombre;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private String category;
+    private Integer stock;
 
-    @NotBlank(message = "La descripcion es obligatoria")
-    private String descripcion;
+    // Getters manuales (esto quita el error de raíz)
+    public String getName() {
+        return name;
+    }
 
-    @Positive(message = "El precio debe ser mayor a 0")
-    private BigDecimal precio;
+    public String getDescription() {
+        return description;
+    }
 
-    @NotBlank(message = "La categoria es obligatoria")
-    private String categoria;
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
 }

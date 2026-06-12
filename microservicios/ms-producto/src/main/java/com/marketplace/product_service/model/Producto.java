@@ -2,34 +2,37 @@ package com.marketplace.product_service.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "productos")
-@Data
+@Table(name = "products")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder // Mantenemos Lombok por si acaso
 public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String nombre;
-
-    @Column(nullable = false)
-    private String descripcion;
-
-    @Column(nullable = false)
-    private BigDecimal precio;
-
-    @Column(nullable = false)
+    private String name;
+    private String description;
+    private BigDecimal price;
     private Integer stock;
+    private String category;
+    private Boolean active;
 
-    @Column(nullable = false)
-    private String categoria;
+    // Escribimos los Setters manuales para que el Service los vea SI o SI
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    private Boolean activo;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 }

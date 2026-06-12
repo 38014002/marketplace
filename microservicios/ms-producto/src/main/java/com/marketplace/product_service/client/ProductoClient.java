@@ -21,7 +21,7 @@ public class ProductoClient {
      * Sincroniza el producto con el microservicio de búsqueda
      */
     public void enviarASearch(Producto producto) {
-        log.info("Sincronizando producto con MS-SEARCH: {}", producto.getNombre());
+        log.info("Sincronizando producto con MS-SEARCH: {}", producto.getName());
 
         webClient.post()
                 .uri(SEARCH_URL)

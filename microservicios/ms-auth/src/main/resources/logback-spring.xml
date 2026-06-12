@@ -7,10 +7,10 @@
 
     <!-- File JSON -->
     <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/auth-service.json</file>
+        <file>logs/ms.auth.json</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/auth-service-%d{yyyy-MM-dd}.json</fileNamePattern>
+            <fileNamePattern>logs/ms.auth-%d{yyyy-MM-dd}.json</fileNamePattern>
             <maxHistory>7</maxHistory>
         </rollingPolicy>
 
