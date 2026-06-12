@@ -1,6 +1,7 @@
 package com.marketplace.ms_inventory.config;
 
 import com.marketplace.ms_inventory.security.JwtFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,30 +16,27 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtFilter jwtFilter;
-
-    // Constructor para inyección de dependencias
-    public SecurityConfig(JwtFilter jwtFilter) {
-        this.jwtFilter = jwtFilter;
-    }
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Desactivamos CSRF ya que usamos JWT
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Permitir ver el stock a todo el mundo (clientes y otros servicios)
-                        .requestMatchers(HttpMethod.GET, "/api/inventario/**").permitAll()
+                        // 1. CORREGIDO: Permitir ver el stock general o por ID a todo el mundo (Ruta
+                        // v1)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/inventory/**").permitAll()
 
-                        // 2. Solo los administradores pueden actualizar o agregar stock
-                        .requestMatchers(HttpMethod.POST, "/api/inventario/**").hasRole("ADMIN")
+                        // 2. CORREGIDO: Rutas de mutación (POST, PUT, DELETE) exclusivas para
+                        // Administradores
+                        .requestMatchers(HttpMethod.POST, "/api/v1/inventory/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/inventory/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/inventory/**").hasRole("ADMIN")
 
-                        // 3. Cualquier otra ruta requiere estar autenticado
                         .anyRequest().authenticated());
 
-        // Añadimos nuestro filtro de JWT antes del filtro estándar de
-        // usuario/contraseña
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,13 +12,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil; // Cambiado a jwtUtil para ser coherente con el nombre de la clase
+    private final JwtUtil jwtUtil;
+
+    public JwtFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     protected void doFilterInternal(
@@ -29,7 +31,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        // 1. Si no hay token o no empieza con Bearer, seguimos
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -40,26 +41,22 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             final String username = jwtUtil.extractUsername(jwt);
 
-            // 2. Si hay username y no está autenticado ya
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 if (jwtUtil.isTokenValid(jwt)) {
-                    String role = jwtUtil.extractRole(jwt);
 
-                    if (role != null) {
-                        // Normalizamos el rol: nos aseguramos de que tenga el prefijo ROLE_
-                        String formattedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                    List<SimpleGrantedAuthority> authorities = jwtUtil.extractAuthorities(jwt);
 
+                    if (!authorities.isEmpty()) {
                         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                                 username,
                                 null,
-                                Collections.singletonList(new SimpleGrantedAuthority(formattedRole)));
+                                authorities);
 
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 }
             }
         } catch (Exception e) {
-            // Si el token es inválido o expira durante el proceso, limpiamos el contexto
             SecurityContextHolder.clearContext();
         }
 
