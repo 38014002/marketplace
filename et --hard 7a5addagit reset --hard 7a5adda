@@ -1,0 +1,41 @@
+[33m41ae3fb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: reset: moving to HEAD
+[33m41ae3fb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{1}: commit: clear
+[33m7a5adda[m HEAD@{2}: commit: Refactor: Ajustar ms-inventory a arquitectura v1, seguridad dinamica y properties formales
+[33m8c7ca60[m HEAD@{3}: commit: ms-gateway configurado
+[33m7053b07[m HEAD@{4}: commit: cambios en los puertos de cada microservicio
+[33mcf77ec5[m HEAD@{5}: commit: arreglo de los pom para que todos tengan la misma version.
+[33mde07d93[m HEAD@{6}: commit: se agrego la dependencia de eureka a todos los microservicios y en el aplicacion properties
+[33mf1abc08[m HEAD@{7}: commit: cambios pendientes
+[33mb9aabb2[m HEAD@{8}: commit (merge): Sincronización entre microservicios
+[33m88da5dd[m HEAD@{9}: commit: cambios en los codigos
+[33m5183859[m HEAD@{10}: commit: agregando comunicacion entre microservicios
+[33md7da055[m HEAD@{11}: commit: eliminado de duplicado de carpeta
+[33m58d8fc5[m HEAD@{12}: pull origin main: Fast-forward
+[33m45e1277[m HEAD@{13}: commit: feat: ms-auth actualizado con version funcional (JWT, Flyway y MySQL)
+[33md872eb1[m HEAD@{14}: commit: cambios en el properties para poder conectarlo a su bd
+[33m598b124[m HEAD@{15}: commit: cambios
+[33ma3a31db[m[33m ([m[1;31morigin/persona2[m[33m, [m[1;32mpersona2[m[33m)[m HEAD@{16}: merge persona2: Fast-forward
+[33m8be0058[m HEAD@{17}: checkout: moving from persona2 to main
+[33ma3a31db[m[33m ([m[1;31morigin/persona2[m[33m, [m[1;32mpersona2[m[33m)[m HEAD@{18}: commit: se agrego webclient a los codigos
+[33m356ce1e[m HEAD@{19}: commit: feat: integracion de ms-notification y actualizaciones en ms-order
+[33m2570576[m HEAD@{20}: checkout: moving from persona2 to persona2
+[33m2570576[m HEAD@{21}: commit: se ssgregaron los codigos faltantes
+[33mbbbe603[m HEAD@{22}: commit: se agrego logs al proyecto
+[33ma740198[m HEAD@{23}: commit: se agrego logs en catalog y creacion del microservico notification
+[33m7fc4292[m HEAD@{24}: commit: termino de codigos resantes solo falta agregar logss
+[33m80ba225[m HEAD@{25}: commit: se creo la estructura del proyecto y se implementaron codigos en algunas carpetas
+[33ma3c51d8[m HEAD@{26}: commit: cambios en carpeta security
+[33mdf80977[m HEAD@{27}: commit: cambios en nombre de las carpetas
+[33m5467534[m HEAD@{28}: commit: cambios en los jwt y en properties
+[33m8be0058[m HEAD@{29}: checkout: moving from main to persona2
+[33m8be0058[m HEAD@{30}: pull --tags origin main: Merge made by the 'ort' strategy.
+[33mfee1fbf[m HEAD@{31}: commit: cambios en webclient para que se comunique con inventory correctamente
+[33m95e9de8[m HEAD@{32}: commit: implementacion de codigos restantes para dejar funcionando el servicio
+[33m7b16e19[m HEAD@{33}: commit: creacion de catalog con sus respectivas carpetas.
+[33m71c04bd[m HEAD@{34}: commit: creacion de los codigos faltantes, se agregaron las dependencias de jwt y flyway en el pom para evitar errores.
+[33m05674cf[m HEAD@{35}: commit: creacion de clases y carpeta para la correcta estructura del proyecto
+[33m3e2d6b9[m HEAD@{36}: commit: cambios en los codigos
+[33mca14e64[m HEAD@{37}: commit: creacion de los codigos en cada carpeta y se agregaron las depencencias faltantes al pom
+[33m44d7a98[m HEAD@{38}: commit: implementacion de capas model, dto, service y repo en ms-user
+[33m1167381[m HEAD@{39}: commit: feat: ms-user base code added to microservices folder
+[33md7134f3[m HEAD@{40}: clone: from https://github.com/38014002/Marketplace.git
