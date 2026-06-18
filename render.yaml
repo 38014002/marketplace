@@ -1,0 +1,40 @@
+# Despliegue remoto en Render (https://render.com)
+# 1. Conectar repositorio GitHub
+# 2. Crear Web Service por microservicio usando Docker
+# 3. Variables de entorno según docker-compose.yml
+
+services:
+  - type: web
+    name: marketplace-gateway
+    runtime: docker
+    dockerfilePath: ./microservicios/Dockerfile
+    dockerContext: ./microservicios
+    dockerCommand: ""
+    buildCommand: ""
+    envVars:
+      - key: SERVICE_DIR
+        value: ms-gateway
+      - key: SERVER_PORT
+        value: 8080
+      - key: EUREKA_HOST
+        sync: false
+      - key: EUREKA_PORT
+        value: 8761
+    healthCheckPath: /actuator/health
+
+  - type: web
+    name: marketplace-user
+    runtime: docker
+    dockerfilePath: ./microservicios/Dockerfile
+    dockerContext: ./microservicios
+    envVars:
+      - key: SERVICE_DIR
+        value: ms-user
+      - key: SERVER_PORT
+        value: 8081
+      - key: JWT_SECRET
+        sync: false
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: DB_PASSWORD
+        sync: false

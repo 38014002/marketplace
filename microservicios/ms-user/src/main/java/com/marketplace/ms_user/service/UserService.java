@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,8 +64,13 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<User> buscarPorUsernameOptional(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Transactional(readOnly = true)
     public User buscarPorUsername(String username) {
-        return userRepository.findByUsername(username)
+        return buscarPorUsernameOptional(username)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado: " + username));
     }
 

@@ -1,10 +1,13 @@
 package com.marketplace.ms_cart.ms_cart.controller;
 
+import com.marketplace.ms_cart.ms_cart.dto.CartDto;
 import com.marketplace.ms_cart.ms_cart.dto.ApiResponse;
 import com.marketplace.ms_cart.ms_cart.model.Cart;
 import com.marketplace.ms_cart.ms_cart.service.CartService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +43,23 @@ public class CartController {
                 .build());
     }
 
-    // 2. LISTAR TODOS LOS CARRITOS REGISTRADOS - RESTRINGIDO: SOLO ADMIN
+    // 2. AGREGAR ÍTEM AL CARRITO
+    @Operation(summary = "Agregar un producto al carrito de un usuario")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Item agregado al carrito")
+    @PostMapping
+    public ResponseEntity<ApiResponse<Cart>> agregar(@Valid @RequestBody CartDto dto) {
+        log.info("Agregando producto {} al carrito del usuario {}", dto.getProductId(), dto.getUserId());
+
+        Cart item = cartService.crear(dto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.<Cart>builder()
+                .success(true)
+                .message("Producto agregado al carrito")
+                .data(item)
+                .build());
+    }
+
+    // 3. LISTAR TODOS LOS CARRITOS REGISTRADOS - RESTRINGIDO: SOLO ADMIN
     @Operation(summary = "Listar todos los ítems de carritos del sistema (Solo ADMIN)")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Listado global obtenido correctamente")
     @GetMapping

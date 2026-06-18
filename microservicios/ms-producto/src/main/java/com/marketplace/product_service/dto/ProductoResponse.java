@@ -1,11 +1,11 @@
 package com.marketplace.product_service.dto;
 
-import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
@@ -13,8 +13,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProductoResponse {
     private Long id;
-    private String nombre;
-    private String descripcion;
-    private BigDecimal precio;
-    private String categoria;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private String category;
+    private Integer stock;
+    private Boolean available;
 }

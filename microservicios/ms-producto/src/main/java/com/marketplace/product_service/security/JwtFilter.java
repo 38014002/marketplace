@@ -43,11 +43,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
                     String user = jwtUtil.obtenerUsuario(token);
                     String role = jwtUtil.obtenerRole(token);
+                    if (role == null || role.isBlank()) {
+                        log.warn("Token sin rol para usuario {}", user);
+                        chain.doFilter(req, res);
+                        return;
+                    }
+                    String authority = role.startsWith("ROLE_") ? role : "ROLE_" + role;
 
                     var auth = new UsernamePasswordAuthenticationToken(
                             user,
                             null,
-                            List.of(new SimpleGrantedAuthority(role))
+                            List.of(new SimpleGrantedAuthority(authority))
                     );
 
                     SecurityContextHolder.getContext().setAuthentication(auth);

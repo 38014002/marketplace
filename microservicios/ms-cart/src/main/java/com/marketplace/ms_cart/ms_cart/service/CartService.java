@@ -43,6 +43,8 @@ public class CartService {
 
         Cart cart = Cart.builder()
                 .userId(dto.getUserId())
+                .productId(dto.getProductId())
+                .quantity(dto.getQuantity())
                 .build();
 
         Cart saved = repository.save(cart);

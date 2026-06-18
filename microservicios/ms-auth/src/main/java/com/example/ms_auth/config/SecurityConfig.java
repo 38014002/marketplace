@@ -30,6 +30,7 @@ public class SecurityConfig {
     }
 
     // 2. Encriptador de contraseñas
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }

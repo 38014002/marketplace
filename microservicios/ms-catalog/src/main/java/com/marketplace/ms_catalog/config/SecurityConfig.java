@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -30,13 +32,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // 1. CUALQUIERA puede ver el catálogo (Ruta pública para el cliente)
-                        .requestMatchers(HttpMethod.GET, "/api/catalog/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/catalog/**").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                        // 2. SOLO ADMIN puede modificar el catálogo (Llamadas desde ms-product o Admin
-                        // Panel)
-                        .requestMatchers(HttpMethod.POST, "/api/catalog/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/catalog/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/catalog/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/catalog/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/catalog/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/catalog/**").hasRole("ADMIN")
 
                         // 3. Cualquier otra cosa requiere autenticación
                         .anyRequest().authenticated())

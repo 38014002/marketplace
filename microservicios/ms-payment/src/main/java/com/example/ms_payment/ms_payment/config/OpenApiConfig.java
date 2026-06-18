@@ -36,7 +36,7 @@ public class OpenApiConfig {
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("ms-payment")
-                .pathsToMatch("/api/**")
+                .pathsToMatch("/api/pagos/**")
                 .build();
     }
 }

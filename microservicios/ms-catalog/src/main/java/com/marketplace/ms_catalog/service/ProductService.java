@@ -8,6 +8,7 @@ import com.marketplace.ms_catalog.model.Product;
 import com.marketplace.ms_catalog.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -37,13 +38,13 @@ public class ProductService {
         // Consultar stock al otro microservicio de forma directa usando tu StockDto
         Integer stock = 0;
         try {
-            StockDto stockInfo = inventoryWebClient.get()
+            ApiResponse<StockDto> stockInfo = inventoryWebClient.get()
                     .uri("/{id}", id)
                     .retrieve()
-                    .bodyToMono(StockDto.class)
+                    .bodyToMono(new ParameterizedTypeReference<ApiResponse<StockDto>>() {})
                     .block();
-            if (stockInfo != null) {
-                stock = stockInfo.getStock();
+            if (stockInfo != null && stockInfo.getData() != null) {
+                stock = stockInfo.getData().getStock();
             }
         } catch (Exception e) {
             log.error("ms-inventory no disponible para ID {}", id);

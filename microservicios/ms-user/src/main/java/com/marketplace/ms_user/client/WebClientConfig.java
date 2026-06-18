@@ -11,7 +11,7 @@ public class WebClientConfig {
     @Bean
     public WebClient notificationWebClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:8086/api/notifications")
+                .baseUrl("http://localhost:8090/api/notifications")
                 .build();
     }
 }

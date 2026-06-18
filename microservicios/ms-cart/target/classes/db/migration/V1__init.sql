@@ -1,12 +1,10 @@
--- Crear la tabla de carrito
-CREATE TABLE carrito (
+CREATE TABLE IF NOT EXISTS cart_items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    userId LONG NOT NULL,
-    productId LONG NOT NULL,
+    user_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
     quantity INT NOT NULL
 );
 
--- Insertar algunos datos de prueba iniciales
-INSERT INTO carrito (userId, productId, quantity) VALUES 
+INSERT INTO cart_items (user_id, product_id, quantity) VALUES
 (1, 1, 1),
 (1, 2, 2);

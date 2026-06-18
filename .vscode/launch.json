@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "ProductServiceApplication",
+            "request": "launch",
+            "mainClass": "com.marketplace.product_service.ProductServiceApplication",
+            "projectName": "ms-producto"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MsUserApplication<ms-user>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/microservicios/ms-user",
+            "mainClass": "com.marketplace.ms_user.MsUserApplication",
+            "projectName": "ms-user",
+            "args": "",
+            "env": {
+                "JWT_SECRET": "esta_es_una_clave_secreta_muy_larga_y_segura_1234567890"
+            }
+        }
+    ]
+}

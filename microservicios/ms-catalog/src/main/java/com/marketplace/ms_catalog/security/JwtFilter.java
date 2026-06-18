@@ -1,5 +1,6 @@
 package com.marketplace.ms_catalog.security;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,18 +42,20 @@ public class JwtFilter extends OncePerRequestFilter {
 
                     // 2. Extraer roles de forma segura (soportando listas o strings individuales)
                     List<String> rawRoles = new ArrayList<>();
-                    try {
-                        Object rolesClaim = jwtUtil.extraerTodoElContenido(token).get("roles");
-                        if (rolesClaim instanceof List) {
-                            rawRoles = (List<String>) rolesClaim;
-                        } else if (rolesClaim instanceof String) {
-                            rawRoles.add((String) rolesClaim);
-                        }
-                    } catch (Exception e) {
-                        log.warn("No se pudieron parsear los roles del token, se intentará con el claim 'role'");
-                        String singleRole = jwtUtil.extraerTodoElContenido(token).get("role", String.class);
-                        if (singleRole != null)
+                    Claims claims = jwtUtil.extraerTodoElContenido(token);
+
+                    Object rolesClaim = claims.get("roles");
+                    if (rolesClaim instanceof List<?> list) {
+                        list.forEach(role -> rawRoles.add(role.toString()));
+                    } else if (rolesClaim instanceof String role) {
+                        rawRoles.add(role);
+                    }
+
+                    if (rawRoles.isEmpty()) {
+                        String singleRole = claims.get("role", String.class);
+                        if (singleRole != null) {
                             rawRoles.add(singleRole);
+                        }
                     }
 
                     // 3. Normalizar todos los roles agregando el prefijo ROLE_ si no lo tienen

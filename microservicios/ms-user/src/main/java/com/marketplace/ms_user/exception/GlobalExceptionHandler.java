@@ -2,6 +2,7 @@ package com.marketplace.ms_user.exception;
 
 import com.marketplace.ms_user.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
@@ -34,6 +35,16 @@ public class GlobalExceptionHandler {
                 ApiResponse.<Object>builder()
                         .success(false)
                         .message(ex.getMessage())
+                        .build());
+    }
+
+    // 🚫 403 (Sin permisos para el recurso)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(403).body(
+                ApiResponse.<Object>builder()
+                        .success(false)
+                        .message("Acceso denegado: se requiere rol ADMIN para esta operación")
                         .build());
     }
 

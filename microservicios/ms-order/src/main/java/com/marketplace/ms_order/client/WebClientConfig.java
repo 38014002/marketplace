@@ -1,5 +1,6 @@
 package com.marketplace.ms_order.client;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -7,41 +8,33 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    // Cambiamos los puertos individuales por la ruta unificada del API Gateway
-    // (puerto 8080)
-
     @Bean
-    public WebClient cartWebClient() {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/cart")
-                .build();
+    public WebClient cartWebClient(
+            @Value("${services.cart.url:http://localhost:8086/api/cart}") String baseUrl) {
+        return WebClient.builder().baseUrl(baseUrl).build();
     }
 
     @Bean
-    public WebClient paymentWebClient() {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/payments")
-                .build();
+    public WebClient paymentWebClient(
+            @Value("${services.payment.url:http://localhost:8088/api/pagos}") String baseUrl) {
+        return WebClient.builder().baseUrl(baseUrl).build();
     }
 
     @Bean
-    public WebClient inventoryWebClient() {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/inventario")
-                .build();
+    public WebClient inventoryWebClient(
+            @Value("${services.inventory.url:http://localhost:8084/api/v1/inventory}") String baseUrl) {
+        return WebClient.builder().baseUrl(baseUrl).build();
     }
 
     @Bean
-    public WebClient catalogWebClient() {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/catalog")
-                .build();
+    public WebClient catalogWebClient(
+            @Value("${services.catalog.url:http://localhost:8085/api/v1/catalog}") String baseUrl) {
+        return WebClient.builder().baseUrl(baseUrl).build();
     }
 
     @Bean
-    public WebClient notificationWebClient() {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/notifications")
-                .build();
+    public WebClient notificationWebClient(
+            @Value("${services.notification.url:http://localhost:8090/api/notifications}") String baseUrl) {
+        return WebClient.builder().baseUrl(baseUrl).build();
     }
 }
