@@ -71,4 +71,38 @@ class CartServiceTest {
         // Then
         verify(repository).delete(cart);
     }
+
+    @Test
+    void listarTodos_debeRetornarCarritos() {
+        when(repository.findAll()).thenReturn(List.of(new Cart()));
+
+        assertEquals(1, cartService.listarTodos().size());
+    }
+
+    @Test
+    void buscarPorId_cuandoExiste_debeRetornarCarrito() {
+        Cart cart = Cart.builder().id(1L).build();
+        when(repository.findById(1L)).thenReturn(Optional.of(cart));
+
+        assertEquals(1L, cartService.buscarPorId(1L).getId());
+    }
+
+    @Test
+    void actualizar_debeModificarCarrito() {
+        Cart cart = Cart.builder().id(1L).userId(1L).build();
+        CartDto dto = new CartDto(2L, 3L, 1);
+        when(repository.findById(1L)).thenReturn(Optional.of(cart));
+        when(repository.save(any(Cart.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Cart updated = cartService.actualizar(1L, dto);
+
+        assertEquals(2L, updated.getUserId());
+    }
+
+    @Test
+    void buscarPorUsuario_debeRetornarItems() {
+        when(repository.findByUserId(3L)).thenReturn(List.of(new Cart()));
+
+        assertEquals(1, cartService.buscarPorUsuario(3L).size());
+    }
 }

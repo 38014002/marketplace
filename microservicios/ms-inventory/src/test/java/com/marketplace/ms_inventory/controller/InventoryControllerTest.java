@@ -68,4 +68,23 @@ class InventoryControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.productId").value(2));
     }
+
+    @Test
+    void actualizarStock_debeRetornar200() throws Exception {
+        when(inventoryService.actualizarStock(1, 5)).thenReturn(
+                Inventory.builder().productId(1).stock(15).build());
+
+        mockMvc.perform(put("/api/v1/inventory/actualizar")
+                        .param("productId", "1")
+                        .param("cantidad", "5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.stock").value(15));
+    }
+
+    @Test
+    void eliminarInventario_debeRetornar200() throws Exception {
+        mockMvc.perform(delete("/api/v1/inventory/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
 }

@@ -83,4 +83,26 @@ class AuthServiceTest {
         // When / Then
         assertThrows(RuntimeException.class, () -> authService.refresh("bad"));
     }
+
+    @Test
+    void refresh_conTokenValido_debeRetornarNuevoAccess() {
+        RefreshToken token = new RefreshToken();
+        token.setUsername("juan");
+        token.setToken("refresh-ok");
+
+        Usuario user = new Usuario();
+        user.setUsername("juan");
+        user.setRole("ROLE_USER");
+
+        when(refreshRepo.findByToken("refresh-ok")).thenReturn(Optional.of(token));
+        when(jwtUtil.esValido("refresh-ok")).thenReturn(true);
+        when(jwtUtil.esRefreshToken("refresh-ok")).thenReturn(true);
+        when(usuarioRepo.findByUsername("juan")).thenReturn(Optional.of(user));
+        when(jwtUtil.generarToken("juan", "ROLE_USER")).thenReturn("new-access");
+
+        AuthResponse response = authService.refresh("refresh-ok");
+
+        assertEquals("new-access", response.getAccessToken());
+        assertEquals("refresh-ok", response.getRefreshToken());
+    }
 }

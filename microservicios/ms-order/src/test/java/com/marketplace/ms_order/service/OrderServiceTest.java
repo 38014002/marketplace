@@ -74,4 +74,56 @@ class OrderServiceTest {
         // When / Then
         assertThrows(RuntimeException.class, () -> orderService.deleteOrder(99L));
     }
+
+    @Test
+    void getAllOrders_debeRetornarLista() {
+        when(orderRepository.findAll()).thenReturn(List.of(new Order()));
+
+        assertEquals(1, orderService.getAllOrders().size());
+    }
+
+    @Test
+    void getOrdersByUser_debeRetornarOrdenesDelUsuario() {
+        when(orderRepository.findByUserId(2L)).thenReturn(List.of(new Order()));
+
+        assertEquals(1, orderService.getOrdersByUser(2L).size());
+    }
+
+    @Test
+    void updateOrder_debeActualizarOrden() {
+        Order existing = Order.builder().id(1L).userId(1L).status("PENDING").totalAmount(100.0).build();
+        Order updated = Order.builder().userId(2L).status("PAID").totalAmount(200.0).build();
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
+
+        Order result = orderService.updateOrder(1L, updated);
+
+        assertEquals("PAID", result.getStatus());
+        assertEquals(2L, result.getUserId());
+    }
+
+    @Test
+    void deleteOrder_debeEliminarOrdenExistente() {
+        Order order = Order.builder().id(1L).build();
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+        orderService.deleteOrder(1L);
+
+        verify(orderRepository).delete(order);
+    }
+
+    @Test
+    void checkout_conPagoRechazado_debeMarcarComoCanceled() {
+        CartItemDto item = CartItemDto.builder().productId(2L).quantity(1).build();
+        Order saved = Order.builder().id(5L).userId(1L).status("PENDING").build();
+
+        when(cartClient.getCartByUser(1L, null)).thenReturn(List.of(item));
+        when(orderRepository.save(any(Order.class))).thenReturn(saved);
+        when(paymentClient.processPayment(5L, null)).thenReturn("REJECTED");
+
+        Order result = orderService.checkout(1L);
+
+        assertEquals("CANCELED", result.getStatus());
+    }
 }

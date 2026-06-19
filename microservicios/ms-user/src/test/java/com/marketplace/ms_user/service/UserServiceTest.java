@@ -78,4 +78,60 @@ class UserServiceTest {
         // Then
         verify(userRepository).delete(user);
     }
+
+    @Test
+    void buscarPorId_cuandoExiste_debeRetornarUsuario() {
+        User user = User.builder().id(1).username("x").build();
+        when(userRepository.findById(1)).thenReturn(Optional.of(user));
+
+        assertEquals("x", userService.buscarPorId(1).getUsername());
+    }
+
+    @Test
+    void actualizar_debeActualizarCampos() {
+        User existing = User.builder().id(1).username("old").email("a@b.com").password("p").role("USER").build();
+        UserRegistrationDto dto = new UserRegistrationDto();
+        dto.setUsername("new");
+        dto.setEmail("n@b.com");
+        dto.setRole("ADMIN");
+
+        when(userRepository.findById(1)).thenReturn(Optional.of(existing));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        User result = userService.actualizar(1, dto);
+
+        assertEquals("new", result.getUsername());
+        assertEquals("ADMIN", result.getRole());
+    }
+
+    @Test
+    void actualizar_conPasswordNueva_debeEncriptar() {
+        User existing = User.builder().id(1).username("u").password("old").build();
+        UserRegistrationDto dto = new UserRegistrationDto();
+        dto.setUsername("u");
+        dto.setPassword("nueva");
+
+        when(userRepository.findById(1)).thenReturn(Optional.of(existing));
+        when(passwordEncoder.encode("nueva")).thenReturn("enc");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        userService.actualizar(1, dto);
+
+        verify(passwordEncoder).encode("nueva");
+    }
+
+    @Test
+    void buscarPorUsername_cuandoNoExiste_debeLanzarExcepcion() {
+        when(userRepository.findByUsername("x")).thenReturn(Optional.empty());
+
+        assertThrows(RecursoNoEncontradoException.class, () -> userService.buscarPorUsername("x"));
+    }
+
+    @Test
+    void buscarPorUsernameOptional_debeRetornarOptional() {
+        when(userRepository.findByUsername("a"))
+                .thenReturn(Optional.of(User.builder().username("a").build()));
+
+        assertTrue(userService.buscarPorUsernameOptional("a").isPresent());
+    }
 }

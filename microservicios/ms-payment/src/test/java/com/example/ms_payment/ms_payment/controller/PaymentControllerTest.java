@@ -65,4 +65,32 @@ class PaymentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("APPROVED"));
     }
+
+    @Test
+    void obtenerPorId_debeRetornar200() throws Exception {
+        when(service.buscarPorId(1L)).thenReturn(Payment.builder()
+                .id(1L).orderId(5L).status("APPROVED").build());
+
+        mockMvc.perform(get("/api/pagos/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("APPROVED"));
+    }
+
+    @Test
+    void actualizar_debeRetornar200() throws Exception {
+        when(service.actualizar(eq(1L), any())).thenReturn(Payment.builder()
+                .id(1L).orderId(5L).amount(BigDecimal.TEN).status("APPROVED").build());
+
+        mockMvc.perform(put("/api/pagos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"orderId\":5,\"amount\":10,\"paymentMethod\":\"CARD\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.orderId").value(5));
+    }
+
+    @Test
+    void eliminar_debeRetornar204() throws Exception {
+        mockMvc.perform(delete("/api/pagos/1"))
+                .andExpect(status().isNoContent());
+    }
 }

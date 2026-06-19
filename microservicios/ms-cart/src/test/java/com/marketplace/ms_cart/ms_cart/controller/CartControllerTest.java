@@ -73,4 +73,14 @@ class CartControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }
+
+    @Test
+    void listarTodos_debeRetornar200() throws Exception {
+        when(cartService.listarTodos()).thenReturn(List.of(
+                Cart.builder().id(1L).userId(1L).productId(2L).quantity(1).build()));
+
+        mockMvc.perform(get("/api/cart"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].productId").value(2));
+    }
 }

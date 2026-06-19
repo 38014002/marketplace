@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -79,5 +80,51 @@ class PaymentServiceTest {
 
         // When / Then
         assertThrows(PaymentNotFoundException.class, () -> paymentService.buscarPorId(99L));
+    }
+
+    @Test
+    void listarTodos_debeRetornarPagos() {
+        when(repository.findAll()).thenReturn(List.of(new Payment()));
+
+        assertEquals(1, paymentService.listarTodos().size());
+    }
+
+    @Test
+    void buscarPorId_cuandoExiste_debeRetornarPago() {
+        Payment payment = new Payment();
+        payment.setId(1L);
+        when(repository.findById(1L)).thenReturn(Optional.of(payment));
+
+        assertEquals(1L, paymentService.buscarPorId(1L).getId());
+    }
+
+    @Test
+    void actualizar_debeModificarPago() {
+        Payment payment = new Payment();
+        payment.setId(1L);
+        payment.setAmount(new BigDecimal("100"));
+
+        PaymentDTO dto = new PaymentDTO();
+        dto.setAmount(new BigDecimal("200"));
+        dto.setPaymentMethod("PayPal");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(payment));
+        when(repository.save(any(Payment.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Payment updated = paymentService.actualizar(1L, dto);
+
+        assertEquals(new BigDecimal("200"), updated.getAmount());
+        assertEquals("PayPal", updated.getPaymentMethod());
+    }
+
+    @Test
+    void eliminar_debeBorrarPago() {
+        Payment payment = new Payment();
+        payment.setId(1L);
+        when(repository.findById(1L)).thenReturn(Optional.of(payment));
+
+        paymentService.eliminar(1L);
+
+        verify(repository).delete(payment);
     }
 }

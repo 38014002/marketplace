@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -85,5 +86,58 @@ class UserControllerTest {
                         .content("{\"username\":\"juan\",\"password\":\"clave\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value("token-jwt"));
+    }
+
+    @Test
+    void login_conCredencialesInvalidas_debeRetornar401() throws Exception {
+        when(userService.buscarPorUsernameOptional("x")).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/api/usuarios/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"x\",\"password\":\"bad\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    void validateForAuth_cuandoExiste_debeRetornar200() throws Exception {
+        when(userService.buscarPorUsernameOptional("admin"))
+                .thenReturn(Optional.of(User.builder().username("admin").build()));
+
+        mockMvc.perform(get("/api/usuarios/validate/admin"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void validateForAuth_cuandoNoExiste_debeRetornar404() throws Exception {
+        when(userService.buscarPorUsernameOptional("x")).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/usuarios/validate/x"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void actualizar_debeRetornar200() throws Exception {
+        UserRegistrationDto dto = UserRegistrationDto.builder()
+                .username("nuevo")
+                .email("n@test.com")
+                .role("USER")
+                .build();
+        when(userService.actualizar(eq(1), any())).thenReturn(User.builder().id(1).username("nuevo").build());
+
+        mockMvc.perform(put("/api/usuarios/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.username").value("nuevo"));
+    }
+
+    @Test
+    void eliminar_debeRetornar200() throws Exception {
+        mockMvc.perform(delete("/api/usuarios/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+
+        verify(userService).eliminar(1);
     }
 }

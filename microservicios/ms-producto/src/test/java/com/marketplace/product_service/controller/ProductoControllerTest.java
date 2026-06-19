@@ -81,4 +81,29 @@ class ProductoControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Monitor"));
     }
+
+    @Test
+    void actualizar_debeRetornar200() throws Exception {
+        ProductoDto dto = ProductoDto.builder()
+                .name("Actualizado")
+                .description("desc")
+                .price(BigDecimal.valueOf(150))
+                .category("Cat")
+                .stock(1)
+                .build();
+        when(service.actualizar(eq(1L), any())).thenReturn(
+                ProductoResponse.builder().id(1L).name("Actualizado").stock(1).available(true).build());
+
+        mockMvc.perform(put("/api/productos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Actualizado"));
+    }
+
+    @Test
+    void eliminar_debeRetornar204() throws Exception {
+        mockMvc.perform(delete("/api/productos/1"))
+                .andExpect(status().isNoContent());
+    }
 }

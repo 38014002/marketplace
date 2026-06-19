@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -64,5 +65,51 @@ class InventoryServiceTest {
 
         // When / Then
         assertThrows(RuntimeException.class, () -> inventoryService.actualizarStock(1, -10));
+    }
+
+    @Test
+    void listarTodo_debeRetornarInventario() {
+        when(inventoryRepository.findAll()).thenReturn(List.of(new Inventory()));
+
+        assertEquals(1, inventoryService.listarTodo().size());
+    }
+
+    @Test
+    void consultarStock_cuandoExiste_debeRetornarCantidad() {
+        Inventory inv = Inventory.builder().productId(1).stock(7).build();
+        when(inventoryRepository.findByProductId(1)).thenReturn(Optional.of(inv));
+
+        assertEquals(7, inventoryService.consultarStock(1));
+    }
+
+    @Test
+    void crearInventario_debeGuardarNuevoRegistro() {
+        Inventory inv = Inventory.builder().productId(2).stock(5).build();
+        when(inventoryRepository.findByProductId(2)).thenReturn(Optional.empty());
+        when(inventoryRepository.save(any(Inventory.class))).thenAnswer(i -> i.getArgument(0));
+
+        Inventory saved = inventoryService.crearInventario(inv);
+
+        assertEquals(5, saved.getStock());
+    }
+
+    @Test
+    void eliminarInventarioPorProducto_debeEliminarRegistro() {
+        Inventory inv = Inventory.builder().productId(3).stock(1).build();
+        when(inventoryRepository.findByProductId(3)).thenReturn(Optional.of(inv));
+
+        inventoryService.eliminarInventarioPorProducto(3);
+
+        verify(inventoryRepository).delete(inv);
+    }
+
+    @Test
+    void actualizarStock_productoNuevo_debeCrearConStock() {
+        when(inventoryRepository.findByProductId(5)).thenReturn(Optional.empty());
+        when(inventoryRepository.save(any(Inventory.class))).thenAnswer(i -> i.getArgument(0));
+
+        Inventory result = inventoryService.actualizarStock(5, 10);
+
+        assertEquals(10, result.getStock());
     }
 }

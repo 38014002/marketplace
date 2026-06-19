@@ -51,4 +51,15 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Login exitoso"));
     }
+
+    @Test
+    void refresh_debeRetornar200() throws Exception {
+        when(service.refresh("refresh-token")).thenReturn(new AuthResponse("new-access", "refresh-token"));
+
+        mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"refresh-token\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.accessToken").value("new-access"));
+    }
 }
