@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:ms_order}?createDatabaseIfNotExist=true&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true}
+  jpa:
+    show-sql: false
+eureka:
+  instance:
+    prefer-ip-address: true
+logging:
+  level:
+    root: INFO
+    com.marketplace.ms_order: INFO
+
+services:
+  cart:
+    url: ${SERVICES_CART_URL:http://ms-cart:8086/api/cart}
+  payment:
+    url: ${SERVICES_PAYMENT_URL:http://ms-payment:8088/api/pagos}
+  inventory:
+    url: ${SERVICES_INVENTORY_URL:http://ms-inventory:8084/api/v1/inventory}
+  catalog:
+    url: ${SERVICES_CATALOG_URL:http://ms-catalog:8085/api/v1/catalog}
+  notification:
+    url: ${SERVICES_NOTIFICATION_URL:http://ms-notification:8090/api/notifications}

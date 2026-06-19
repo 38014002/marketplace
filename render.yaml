@@ -1,40 +1,320 @@
-# Despliegue remoto en Render (https://render.com)
-# 1. Conectar repositorio GitHub
-# 2. Crear Web Service por microservicio usando Docker
-# 3. Variables de entorno según docker-compose.yml
+# Blueprint Render — Marketplace Microservicios
+# https://render.com/docs/blueprint-spec
+#
+# Requisitos previos:
+# 1. MySQL externo (Railway, Aiven, PlanetScale, etc.)
+# 2. Configurar DB_HOST y DB_PASSWORD en el grupo marketplace-shared
+# 3. Conectar repo GitHub → New Blueprint → seleccionar render.yaml
+#
+# URL pública: https://marketplace-gateway.onrender.com (tras el deploy)
 
-services:
-  - type: web
-    name: marketplace-gateway
-    runtime: docker
-    dockerfilePath: ./microservicios/Dockerfile
-    dockerContext: ./microservicios
-    dockerCommand: ""
-    buildCommand: ""
+envVarGroups:
+  - name: marketplace-shared
     envVars:
-      - key: SERVICE_DIR
-        value: ms-gateway
-      - key: SERVER_PORT
-        value: 8080
-      - key: EUREKA_HOST
-        sync: false
-      - key: EUREKA_PORT
-        value: 8761
-    healthCheckPath: /actuator/health
-
-  - type: web
-    name: marketplace-user
-    runtime: docker
-    dockerfilePath: ./microservicios/Dockerfile
-    dockerContext: ./microservicios
-    envVars:
-      - key: SERVICE_DIR
-        value: ms-user
-      - key: SERVER_PORT
-        value: 8081
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
       - key: JWT_SECRET
-        sync: false
-      - key: SPRING_DATASOURCE_URL
+        generateValue: true
+      - key: DB_USER
+        value: root
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_HOST
         sync: false
       - key: DB_PASSWORD
         sync: false
+
+services:
+  # --- Infraestructura ---
+  - type: pserv
+    name: marketplace-eureka
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./microservicios/ms-eureka/Dockerfile
+    dockerContext: ./microservicios/ms-eureka
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8761
+
+  # --- API Gateway (único servicio público) ---
+  - type: web
+    name: marketplace-gateway
+    runtime: docker
+    region: oregon
+    plan: free
+    dockerfilePath: ./microservicios/ms-gateway/Dockerfile
+    dockerContext: ./microservicios/ms-gateway
+    healthCheckPath: /actuator/health
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8080
+      - key: EUREKA_HOST
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: host
+      - key: EUREKA_PORT
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: port
+
+  # --- Microservicios de negocio (red privada Render) ---
+  - type: pserv
+    name: marketplace-ms-user
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./microservicios/ms-user/Dockerfile
+    dockerContext: ./microservicios/ms-user
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8081
+      - key: DB_NAME
+        value: ms_user
+      - key: EUREKA_HOST
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: host
+      - key: EUREKA_PORT
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: port
+
+  - type: pserv
+    name: marketplace-ms-inventory
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./microservicios/ms-inventory/Dockerfile
+    dockerContext: ./microservicios/ms-inventory
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8084
+      - key: DB_NAME
+        value: ms_inventory
+      - key: EUREKA_HOST
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: host
+      - key: EUREKA_PORT
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: port
+
+  - type: pserv
+    name: marketplace-ms-catalog
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./microservicios/ms-catalog/Dockerfile
+    dockerContext: ./microservicios/ms-catalog
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8085
+      - key: DB_NAME
+        value: ms_catalog
+      - key: SERVICES_INVENTORY_URL
+        value: http://marketplace-ms-inventory:8084/api/v1/inventory
+      - key: SERVICES_SEARCH_URL
+        value: http://marketplace-ms-search:8089/api/search
+      - key: EUREKA_HOST
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: host
+      - key: EUREKA_PORT
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: port
+
+  - type: pserv
+    name: marketplace-ms-search
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./microservicios/ms-search/Dockerfile
+    dockerContext: ./microservicios/ms-search
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8089
+      - key: DB_NAME
+        value: ms_search
+      - key: EUREKA_HOST
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: host
+      - key: EUREKA_PORT
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: port
+
+  - type: pserv
+    name: marketplace-ms-producto
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./microservicios/ms-producto/Dockerfile
+    dockerContext: ./microservicios/ms-producto
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8082
+      - key: SERVICES_CATALOG_URL
+        value: http://marketplace-ms-catalog:8085/api/v1/catalog
+      - key: SERVICES_INVENTORY_URL
+        value: http://marketplace-ms-inventory:8084/api/v1/inventory
+      - key: EUREKA_HOST
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: host
+      - key: EUREKA_PORT
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: port
+
+  - type: pserv
+    name: marketplace-ms-cart
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./microservicios/ms-cart/Dockerfile
+    dockerContext: ./microservicios/ms-cart
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8086
+      - key: DB_NAME
+        value: ms_cart
+      - key: EUREKA_HOST
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: host
+      - key: EUREKA_PORT
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: port
+
+  - type: pserv
+    name: marketplace-ms-auth
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./microservicios/ms-auth/Dockerfile
+    dockerContext: ./microservicios/ms-auth
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8087
+      - key: DB_NAME
+        value: ms_auth
+      - key: EUREKA_HOST
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: host
+      - key: EUREKA_PORT
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: port
+
+  - type: pserv
+    name: marketplace-ms-payment
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./microservicios/ms-payment/Dockerfile
+    dockerContext: ./microservicios/ms-payment
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8088
+      - key: DB_NAME
+        value: ms_payment
+      - key: EUREKA_HOST
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: host
+      - key: EUREKA_PORT
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: port
+
+  - type: pserv
+    name: marketplace-ms-order
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./microservicios/ms-order/Dockerfile
+    dockerContext: ./microservicios/ms-order
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8083
+      - key: DB_NAME
+        value: ms_order
+      - key: SERVICES_CART_URL
+        value: http://marketplace-ms-cart:8086/api/cart
+      - key: SERVICES_PAYMENT_URL
+        value: http://marketplace-ms-payment:8088/api/pagos
+      - key: SERVICES_INVENTORY_URL
+        value: http://marketplace-ms-inventory:8084/api/v1/inventory
+      - key: SERVICES_CATALOG_URL
+        value: http://marketplace-ms-catalog:8085/api/v1/catalog
+      - key: SERVICES_NOTIFICATION_URL
+        value: http://marketplace-ms-notification:8090/api/notifications
+      - key: EUREKA_HOST
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: host
+      - key: EUREKA_PORT
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: port
+
+  - type: pserv
+    name: marketplace-ms-notification
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./microservicios/ms-notification/Dockerfile
+    dockerContext: ./microservicios/ms-notification
+    envVars:
+      - fromGroup: marketplace-shared
+      - key: SERVER_PORT
+        value: 8090
+      - key: DB_NAME
+        value: ms_notification
+      - key: EUREKA_HOST
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: host
+      - key: EUREKA_PORT
+        fromService:
+          type: pserv
+          name: marketplace-eureka
+          property: port

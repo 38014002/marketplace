@@ -109,6 +109,34 @@ cd microservicios/ms-eureka
 # Repetir en cada microservicio necesario
 ```
 
+## Perfiles Spring (dev / prod)
+
+Cada microservicio usa perfiles YAML `application-dev.yml` y `application-prod.yml` junto con `application.properties` (configuración base).
+
+| Perfil | Cuándo | Características |
+|--------|--------|-----------------|
+| `dev` (default) | IDE local, XAMPP | SQL visible, logging DEBUG, `ddl-auto=update` donde aplica |
+| `prod` | Docker Compose, Render | Eureka `prefer-ip-address`, SQL oculto, URLs por variables de entorno |
+
+Activar perfil:
+
+```bash
+# Local (default dev, no requiere variable)
+./mvnw spring-boot:run
+
+# Producción explícita
+SPRING_PROFILES_ACTIVE=prod ./mvnw spring-boot:run
+```
+
+Variables clave por entorno:
+
+| Variable | Local | Docker | Render |
+|----------|-------|--------|--------|
+| `SPRING_PROFILES_ACTIVE` | `dev` | `dev` | `prod` |
+| `DB_HOST` | `localhost` | `mysql` | host MySQL externo |
+| `EUREKA_HOST` | `localhost` | `ms-eureka` | vía `fromService` |
+| `JWT_SECRET` | `.env` | `.env` | auto-generado |
+
 ## Ejecución con Docker
 
 ```bash
@@ -120,14 +148,33 @@ docker compose up --build
 - Gateway: http://localhost:8080
 - Eureka: http://localhost:8761
 - MySQL: puerto 3306
+- Perfil activo: `dev` (definido en `docker-compose.yml`)
 
 ## Despliegue remoto (Render)
 
-El archivo `render.yaml` en la raíz del proyecto define servicios Docker para despliegue en [Render](https://render.com):
+**URL pública (tras deploy):** `https://marketplace-gateway.onrender.com`
 
-1. Conectar el repositorio de GitHub.
-2. Crear Web Services usando el `Dockerfile` en `microservicios/`.
-3. Configurar variables: `JWT_SECRET`, `SPRING_DATASOURCE_URL`, `DB_PASSWORD`, `SERVICE_DIR`.
+El archivo [`render.yaml`](render.yaml) define el blueprint completo:
+
+1. **MySQL externo** — Render no ofrece MySQL nativo. Crear instancia en [Railway](https://railway.app), [Aiven](https://aiven.io) u otro proveedor.
+2. **Conectar GitHub** en [Render Dashboard](https://dashboard.render.com) → **New** → **Blueprint** → seleccionar el repo.
+3. **Configurar variables** en el grupo `marketplace-shared`:
+   - `DB_HOST` — hostname del MySQL externo
+   - `DB_PASSWORD` — contraseña de la BD
+4. Render despliega automáticamente:
+   - `marketplace-gateway` (público, health check `/actuator/health`)
+   - `marketplace-eureka` + 10 microservicios (red privada)
+5. Verificar: `GET https://marketplace-gateway.onrender.com/actuator/health`
+
+```bash
+# Ejemplo de prueba tras deploy
+curl https://marketplace-gateway.onrender.com/api/productos
+curl -X POST https://marketplace-gateway.onrender.com/api/usuarios/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@test.com","password":"secret"}'
+```
+
+> **Nota:** El plan free de Render suspende servicios tras inactividad (~50 s de cold start). Los private services (`pserv`) requieren plan Starter o superior.
 
 ## Pruebas unitarias y cobertura
 

@@ -1,0 +1,8 @@
+spring:
+  jpa:
+    show-sql: true
+logging:
+  level:
+    com.marketplace.ms_notification: DEBUG
+    org.flywaydb: DEBUG
+    org.hibernate.SQL: DEBUG

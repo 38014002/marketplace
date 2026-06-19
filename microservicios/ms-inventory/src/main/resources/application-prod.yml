@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:ms_inventory}?createDatabaseIfNotExist=true&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true}
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+eureka:
+  instance:
+    prefer-ip-address: true
+logging:
+  level:
+    root: INFO
+    org.springframework.security: WARN

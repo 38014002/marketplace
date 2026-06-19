@@ -1,0 +1,18 @@
+eureka:
+  instance:
+    prefer-ip-address: true
+    hostname: ${HOSTNAME:ms-gateway}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: INFO

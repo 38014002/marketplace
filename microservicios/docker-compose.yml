@@ -19,46 +19,47 @@ services:
 
   ms-eureka:
     build:
-      context: .
+      context: ./ms-eureka
       dockerfile: Dockerfile
-      args:
-        SERVICE_DIR: ms-eureka
     container_name: ms-eureka
     ports:
       - "8761:8761"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8761
 
   ms-gateway:
     build:
-      context: .
+      context: ./ms-gateway
       dockerfile: Dockerfile
-      args:
-        SERVICE_DIR: ms-gateway
     container_name: ms-gateway
     ports:
       - "8080:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8080
       EUREKA_HOST: ms-eureka
-      EUREKA_PORT: 8761
+      EUREKA_PORT: "8761"
     depends_on:
       - ms-eureka
 
   ms-user:
     build:
-      context: .
+      context: ./ms-user
       dockerfile: Dockerfile
-      args:
-        SERVICE_DIR: ms-user
     container_name: ms-user
     ports:
       - "8081:8081"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8081
+      EUREKA_HOST: ms-eureka
+      EUREKA_PORT: "8761"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_NAME: ms_user
       DB_PASSWORD: ${DB_PASSWORD:-}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ms_user?createDatabaseIfNotExist=true
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://ms-eureka:8761/eureka/
       JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
     depends_on:
       mysql:
@@ -68,20 +69,19 @@ services:
 
   ms-producto:
     build:
-      context: .
+      context: ./ms-producto
       dockerfile: Dockerfile
-      args:
-        SERVICE_DIR: ms-producto
     container_name: ms-producto
     ports:
       - "8082:8082"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8082
-      CATALOG_URL: http://ms-catalog:8085/api/v1/catalog
-      INVENTORY_URL: http://ms-inventory:8084/api/v1/inventory
+      EUREKA_HOST: ms-eureka
+      EUREKA_PORT: "8761"
+      JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
       SERVICES_CATALOG_URL: http://ms-catalog:8085/api/v1/catalog
       SERVICES_INVENTORY_URL: http://ms-inventory:8084/api/v1/inventory
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://ms-eureka:8761/eureka/
     depends_on:
       - ms-eureka
       - ms-catalog
@@ -89,22 +89,27 @@ services:
 
   ms-order:
     build:
-      context: .
+      context: ./ms-order
       dockerfile: Dockerfile
-      args:
-        SERVICE_DIR: ms-order
     container_name: ms-order
     ports:
       - "8083:8083"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8083
+      EUREKA_HOST: ms-eureka
+      EUREKA_PORT: "8761"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_NAME: ms_order
       DB_PASSWORD: ${DB_PASSWORD:-}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ms_order?createDatabaseIfNotExist=true
-      CART_URL: http://ms-cart:8086/api/cart
-      PAYMENT_URL: http://ms-payment:8088/api/pagos
+      JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
       SERVICES_CART_URL: http://ms-cart:8086/api/cart
       SERVICES_PAYMENT_URL: http://ms-payment:8088/api/pagos
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://ms-eureka:8761/eureka/
+      SERVICES_INVENTORY_URL: http://ms-inventory:8084/api/v1/inventory
+      SERVICES_CATALOG_URL: http://ms-catalog:8085/api/v1/catalog
+      SERVICES_NOTIFICATION_URL: http://ms-notification:8090/api/notifications
     depends_on:
       mysql:
         condition: service_healthy
@@ -117,18 +122,22 @@ services:
 
   ms-inventory:
     build:
-      context: .
+      context: ./ms-inventory
       dockerfile: Dockerfile
-      args:
-        SERVICE_DIR: ms-inventory
     container_name: ms-inventory
     ports:
       - "8084:8084"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8084
+      EUREKA_HOST: ms-eureka
+      EUREKA_PORT: "8761"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_NAME: ms_inventory
       DB_PASSWORD: ${DB_PASSWORD:-}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ms_inventory?createDatabaseIfNotExist=true
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://ms-eureka:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
     depends_on:
       mysql:
         condition: service_healthy
@@ -137,22 +146,24 @@ services:
 
   ms-catalog:
     build:
-      context: .
+      context: ./ms-catalog
       dockerfile: Dockerfile
-      args:
-        SERVICE_DIR: ms-catalog
     container_name: ms-catalog
     ports:
       - "8085:8085"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8085
+      EUREKA_HOST: ms-eureka
+      EUREKA_PORT: "8761"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_NAME: ms_catalog
       DB_PASSWORD: ${DB_PASSWORD:-}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ms_catalog?createDatabaseIfNotExist=true
-      INVENTORY_URL: http://ms-inventory:8084/api/v1/inventory
-      SEARCH_URL: http://ms-search:8089/api/search
+      JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
       SERVICES_INVENTORY_URL: http://ms-inventory:8084/api/v1/inventory
       SERVICES_SEARCH_URL: http://ms-search:8089/api/search
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://ms-eureka:8761/eureka/
     depends_on:
       mysql:
         condition: service_healthy
@@ -161,18 +172,46 @@ services:
 
   ms-cart:
     build:
-      context: .
+      context: ./ms-cart
       dockerfile: Dockerfile
-      args:
-        SERVICE_DIR: ms-cart
     container_name: ms-cart
     ports:
       - "8086:8086"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8086
+      EUREKA_HOST: ms-eureka
+      EUREKA_PORT: "8761"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_NAME: ms_cart
       DB_PASSWORD: ${DB_PASSWORD:-}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ms_cart?createDatabaseIfNotExist=true
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://ms-eureka:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      ms-eureka:
+        condition: service_started
+
+  ms-auth:
+    build:
+      context: ./ms-auth
+      dockerfile: Dockerfile
+    container_name: ms-auth
+    ports:
+      - "8087:8087"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 8087
+      EUREKA_HOST: ms-eureka
+      EUREKA_PORT: "8761"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_NAME: ms_auth
+      DB_PASSWORD: ${DB_PASSWORD:-}
+      JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
     depends_on:
       mysql:
         condition: service_healthy
@@ -181,18 +220,22 @@ services:
 
   ms-payment:
     build:
-      context: .
+      context: ./ms-payment
       dockerfile: Dockerfile
-      args:
-        SERVICE_DIR: ms-payment
     container_name: ms-payment
     ports:
       - "8088:8088"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8088
+      EUREKA_HOST: ms-eureka
+      EUREKA_PORT: "8761"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_NAME: ms_payment
       DB_PASSWORD: ${DB_PASSWORD:-}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ms_payment?createDatabaseIfNotExist=true
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://ms-eureka:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
     depends_on:
       mysql:
         condition: service_healthy
@@ -201,18 +244,21 @@ services:
 
   ms-search:
     build:
-      context: .
+      context: ./ms-search
       dockerfile: Dockerfile
-      args:
-        SERVICE_DIR: ms-search
     container_name: ms-search
     ports:
       - "8089:8089"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8089
+      EUREKA_HOST: ms-eureka
+      EUREKA_PORT: "8761"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_NAME: ms_search
       DB_PASSWORD: ${DB_PASSWORD:-}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ms_search?createDatabaseIfNotExist=true
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://ms-eureka:8761/eureka/
     depends_on:
       mysql:
         condition: service_healthy
@@ -221,18 +267,22 @@ services:
 
   ms-notification:
     build:
-      context: .
+      context: ./ms-notification
       dockerfile: Dockerfile
-      args:
-        SERVICE_DIR: ms-notification
     container_name: ms-notification
     ports:
       - "8090:8090"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8090
+      EUREKA_HOST: ms-eureka
+      EUREKA_PORT: "8761"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_NAME: ms_notification
       DB_PASSWORD: ${DB_PASSWORD:-}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ms_notification?createDatabaseIfNotExist=true
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://ms-eureka:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
     depends_on:
       mysql:
         condition: service_healthy

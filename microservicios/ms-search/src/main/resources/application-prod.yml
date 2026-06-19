@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:ms_search}?createDatabaseIfNotExist=true&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true}
+  jpa:
+    show-sql: false
+eureka:
+  instance:
+    prefer-ip-address: true
+logging:
+  level:
+    root: INFO
+    com.marketplace.ms_search: INFO

@@ -1,10 +1,8 @@
-server:
-  port: ${SERVER_PORT:8080}
-
 spring:
   application:
     name: ms-gateway
-
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   cloud:
     gateway:
       routes:
@@ -63,6 +61,9 @@ spring:
             - Path=/api/inventory/**
           filters:
             - RewritePath=/api/inventory/(?<segment>.*), /api/v1/inventory/${segment}
+
+server:
+  port: ${SERVER_PORT:8080}
 
 eureka:
   client:
