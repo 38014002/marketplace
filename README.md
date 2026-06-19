@@ -45,7 +45,7 @@ Comunicación entre microservicios: **WebClient**. Registro de servicios: **Eure
 - Spring Cloud Gateway + Eureka
 - Spring Data JPA + Hibernate
 - MySQL
-- Flyway (según microservicio)
+- Flyway (migraciones versionadas en todos los MS con BD)
 - WebClient
 - JWT
 - Swagger / OpenAPI (springdoc)
@@ -115,8 +115,8 @@ Cada microservicio usa perfiles YAML `application-dev.yml` y `application-prod.y
 
 | Perfil | Cuándo | Características |
 |--------|--------|-----------------|
-| `dev` (default) | IDE local, XAMPP | SQL visible, logging DEBUG, `ddl-auto=update` donde aplica |
-| `prod` | Docker Compose, Render | Eureka `prefer-ip-address`, SQL oculto, URLs por variables de entorno |
+| `dev` (default) | IDE local, XAMPP | SQL visible, logging DEBUG, esquema vía **Flyway** |
+| `prod` | Docker Compose, Render | Eureka `prefer-ip-address`, SQL oculto, esquema vía **Flyway** |
 
 Activar perfil:
 
@@ -185,6 +185,8 @@ Cada microservicio de negocio incluye pruebas en **tres capas** con **JUnit 5 + 
 | **Service** | `@ExtendWith(MockitoExtension.class)` + `@Mock` / `@InjectMocks` | Sí — dependencias simuladas con `when()` / `verify()` |
 | **Controller** | `@WebMvcTest` + `MockMvc` + `@MockBean` | Sí — `@MockBean` inyecta mocks Mockito del service (y `JwtUtil` si hay seguridad) |
 | **Repository** | `@DataJpaTest` + H2 en memoria | No — prueba real de persistencia y queries Spring Data |
+
+Los tests de repositorio usan `src/test/resources/application.properties` con H2 en memoria (no conectan a MySQL local).
 
 ```bash
 cd microservicios/ms-user
