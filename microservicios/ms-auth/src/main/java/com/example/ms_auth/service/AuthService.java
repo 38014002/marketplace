@@ -18,7 +18,9 @@ import com.example.ms_auth.repository.UsuarioRepository;
 import com.example.ms_auth.security.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -29,8 +31,8 @@ public class AuthService {
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
 
-    // 🔹 REGISTER
     public AuthResponse register(RegisterRequest req) {
+        log.info("Registrando usuario en ms-auth: {}", req.getUsername());
 
         Usuario user = new Usuario();
         user.setUsername(req.getUsername());
@@ -42,11 +44,12 @@ public class AuthService {
         String access = jwtUtil.generarToken(user.getUsername(), user.getRole());
         String refresh = generarRefreshToken(user.getUsername());
 
+        log.info("Usuario {} registrado correctamente", req.getUsername());
         return new AuthResponse(access, refresh);
     }
 
-    // 🔹 LOGIN
     public AuthResponse login(LoginRequest req) {
+        log.info("Login en ms-auth para usuario {}", req.getUsername());
 
         authManager.authenticate(
             new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword())
@@ -60,25 +63,24 @@ public class AuthService {
         return new AuthResponse(access, refresh);
     }
 
-    // 🔹 REFRESH
     public AuthResponse refresh(String refreshToken) {
+        log.debug("Renovando access token");
 
         RefreshToken token = refreshRepo.findByToken(refreshToken)
                 .orElseThrow(() -> new RuntimeException("Refresh inválido"));
 
         if (!jwtUtil.esValido(refreshToken) || !jwtUtil.esRefreshToken(refreshToken)) {
+            log.warn("Refresh token inválido");
             throw new RuntimeException("Refresh token inválido");
         }
 
         Usuario user = usuarioRepo.findByUsername(token.getUsername()).get();
-
         String newAccess = jwtUtil.generarToken(user.getUsername(), user.getRole());
 
         return new AuthResponse(newAccess, refreshToken);
     }
 
     private String generarRefreshToken(String username) {
-
         String token = UUID.randomUUID().toString();
 
         RefreshToken rt = new RefreshToken();
@@ -87,7 +89,6 @@ public class AuthService {
         rt.setExpiryDate(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24));
 
         refreshRepo.save(rt);
-
         return token;
     }
 }

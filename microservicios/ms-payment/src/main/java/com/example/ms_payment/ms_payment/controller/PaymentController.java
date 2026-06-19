@@ -15,11 +15,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Tag(name = "Pagos", description = "Gestión de pagos y procesamiento de órdenes")
 @RestController
 @RequestMapping("/api/pagos")
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentController {
 
     private final PaymentService service;
@@ -42,6 +44,7 @@ public class PaymentController {
     @ApiResponse(responseCode = "201", description = "Pago creado")
     @PostMapping
     public ResponseEntity<Payment> crear(@Valid @RequestBody PaymentDTO dto) {
+        log.info("POST /api/pagos - orden {}", dto.getOrderId());
         Payment creado = service.crear(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
@@ -65,6 +68,7 @@ public class PaymentController {
     @ApiResponse(responseCode = "200", description = "Resultado APPROVED o REJECTED")
     @PostMapping("/process/{orderId}")
     public ResponseEntity<String> processPayment(@PathVariable Long orderId) {
+        log.info("POST /api/pagos/process/{}", orderId);
         return ResponseEntity.ok("APPROVED");
     }
 }

@@ -4,6 +4,8 @@ import com.marketplace.ms_inventory.dto.ApiResponse; // DTO estándar del proyec
 import com.marketplace.ms_inventory.dto.StockResponse;
 import com.marketplace.ms_inventory.model.Inventory;
 import com.marketplace.ms_inventory.service.InventoryService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,13 +14,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/inventory")
+@RequiredArgsConstructor
+@Slf4j
 public class InventoryController {
 
     private final InventoryService inventoryService;
-
-    InventoryController(InventoryService inventoryService) {
-        this.inventoryService = inventoryService;
-    }
 
     // ==========================================================
     // 1. GET - Consultar Inventario General (Todos los productos)
@@ -59,6 +59,7 @@ public class InventoryController {
     // ==========================================================
     @PostMapping
     public ResponseEntity<ApiResponse<Inventory>> crearInventario(@RequestBody Inventory inventory) {
+        log.info("POST /api/v1/inventory - producto {}", inventory.getProductId());
         Inventory nuevoInventario = inventoryService.crearInventario(inventory);
 
         ApiResponse<Inventory> response = new ApiResponse<>(
@@ -78,6 +79,7 @@ public class InventoryController {
             @RequestParam Integer productId,
             @RequestParam Integer cantidad) {
 
+        log.info("PUT /api/v1/inventory/actualizar - producto {} cantidad {}", productId, cantidad);
         Inventory inventoryActualizado = inventoryService.actualizarStock(productId, cantidad);
 
         ApiResponse<Inventory> response = new ApiResponse<>(
@@ -94,6 +96,7 @@ public class InventoryController {
     // ==========================================================
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse<Void>> eliminarInventario(@PathVariable Integer productId) {
+        log.info("DELETE /api/v1/inventory/{}", productId);
         inventoryService.eliminarInventarioPorProducto(productId);
 
         ApiResponse<Void> response = new ApiResponse<>(

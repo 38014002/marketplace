@@ -14,11 +14,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Tag(name = "Búsqueda", description = "Búsqueda de productos e índice sincronizado desde catálogo")
 @RestController
 @RequestMapping("/api/search")
 @RequiredArgsConstructor
+@Slf4j
 public class SearchController {
 
     private final SearchService service;
@@ -29,6 +31,7 @@ public class SearchController {
     public ResponseEntity<List<ProductResponseDto>> buscar(
             @Parameter(description = "Texto a buscar en el nombre del producto", example = "mouse")
             @RequestParam String query) {
+        log.info("GET /api/search?query={}", query);
         return ResponseEntity.ok(service.buscar(query));
     }
 
@@ -36,6 +39,7 @@ public class SearchController {
     @ApiResponse(responseCode = "200", description = "Producto sincronizado")
     @PostMapping("/sync")
     public ResponseEntity<String> sincronizar(@RequestBody SearchProduct producto) {
+        log.info("POST /api/search/sync - producto ID {}", producto.getId());
         service.guardarProductoParaBusqueda(producto);
         return ResponseEntity.ok("Producto recibido y sincronizado correctamente");
     }

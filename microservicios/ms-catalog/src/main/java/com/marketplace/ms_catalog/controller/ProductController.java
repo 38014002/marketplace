@@ -6,6 +6,7 @@ import com.marketplace.ms_catalog.model.Product;
 import com.marketplace.ms_catalog.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/catalog")
 @RequiredArgsConstructor
+@Slf4j
 public class ProductController {
 
     private final ProductService productService;
@@ -37,6 +39,7 @@ public class ProductController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Product> crear(@Valid @RequestBody ProductRequestDTO dto) {
+        log.info("POST /api/v1/catalog - crear producto {}", dto.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.crearProducto(dto));
     }
 
@@ -44,6 +47,7 @@ public class ProductController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Product> actualizar(@PathVariable Long id, @Valid @RequestBody ProductRequestDTO dto) {
+        log.info("PUT /api/v1/catalog/{} - actualizar producto", id);
         return ResponseEntity.ok(productService.actualizarProducto(id, dto));
     }
 
@@ -51,6 +55,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        log.info("DELETE /api/v1/catalog/{} - eliminar producto", id);
         productService.eliminarProducto(id);
         return ResponseEntity.noContent().build();
     }

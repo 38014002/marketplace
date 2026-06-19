@@ -8,6 +8,7 @@ import com.marketplace.product_service.client.dto.StockInfo;
 import com.marketplace.product_service.dto.ProductoDto;
 import com.marketplace.product_service.dto.ProductoResponse;
 import com.marketplace.product_service.exception.RecursoNoEncontradoException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class ProductoService {
 
@@ -32,6 +34,7 @@ public class ProductoService {
     }
 
     public List<ProductoResponse> listarTodos() {
+        log.debug("Listando productos agregados (catalog + inventory)");
         CatalogProduct[] productos = catalogWebClient.get()
                 .retrieve()
                 .bodyToMono(CatalogProduct[].class)
@@ -47,6 +50,7 @@ public class ProductoService {
     }
 
     public ProductoResponse buscarPorId(Long id) {
+        log.debug("Buscando producto agregado ID {}", id);
         try {
             ServiceApiResponse<Map<String, Object>> response = catalogWebClient.get()
                     .uri("/{id}", id)
@@ -65,6 +69,7 @@ public class ProductoService {
     }
 
     public ProductoResponse crear(ProductoDto dto) {
+        log.info("Creando producto agregado: {}", dto.getName());
         CatalogProductRequest request = CatalogProductRequest.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
@@ -101,6 +106,7 @@ public class ProductoService {
     }
 
     public ProductoResponse actualizar(Long id, ProductoDto dto) {
+        log.info("Actualizando producto agregado ID {}", id);
         CatalogProductRequest request = CatalogProductRequest.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
@@ -128,6 +134,7 @@ public class ProductoService {
     }
 
     public void eliminar(Long id) {
+        log.info("Eliminando producto agregado ID {}", id);
         try {
             catalogWebClient.delete()
                     .uri("/{id}", id)
