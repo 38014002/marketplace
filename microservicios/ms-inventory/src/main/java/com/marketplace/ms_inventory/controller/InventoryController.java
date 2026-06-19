@@ -1,9 +1,12 @@
 package com.marketplace.ms_inventory.controller;
 
-import com.marketplace.ms_inventory.dto.ApiResponse; // DTO estándar del proyecto
+import com.marketplace.ms_inventory.dto.ApiResponse;
 import com.marketplace.ms_inventory.dto.StockResponse;
 import com.marketplace.ms_inventory.model.Inventory;
 import com.marketplace.ms_inventory.service.InventoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Inventario", description = "Consulta y gestión de stock por producto")
 @RestController
 @RequestMapping("/api/v1/inventory")
 @RequiredArgsConstructor
@@ -20,12 +24,10 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    // ==========================================================
-    // 1. GET - Consultar Inventario General (Todos los productos)
-    // ==========================================================
+    @Operation(summary = "Listar inventario completo")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Inventario consultado")
     @GetMapping
     public ResponseEntity<ApiResponse<List<Inventory>>> obtenerInventarioGeneral() {
-        // Llama al servicio para obtener la lista completa de registros
         List<Inventory> inventarioCompleto = inventoryService.listarTodo();
 
         ApiResponse<List<Inventory>> response = new ApiResponse<>(
@@ -37,11 +39,11 @@ public class InventoryController {
         return ResponseEntity.ok(response);
     }
 
-    // ==========================================================
-    // 2. GET - Consultar Stock de un Producto Específico (Opcional/Detalle)
-    // ==========================================================
+    @Operation(summary = "Consultar stock de un producto")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Stock obtenido")
     @GetMapping("/{productId}")
-    public ResponseEntity<ApiResponse<StockResponse>> obtenerStockPorProducto(@PathVariable Integer productId) {
+    public ResponseEntity<ApiResponse<StockResponse>> obtenerStockPorProducto(
+            @Parameter(description = "ID del producto en catálogo", example = "1") @PathVariable Integer productId) {
         Integer stock = inventoryService.consultarStock(productId);
         StockResponse stockResponse = new StockResponse(productId, stock, stock > 0);
 
@@ -54,9 +56,9 @@ public class InventoryController {
         return ResponseEntity.ok(response);
     }
 
-    // ==========================================================
-    // 3. POST - Crear/Registrar Nuevo Inventario
-    // ==========================================================
+    @Operation(summary = "Registrar inventario", description = "Crea stock inicial para un producto")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Inventario creado")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Producto ya registrado")
     @PostMapping
     public ResponseEntity<ApiResponse<Inventory>> crearInventario(@RequestBody Inventory inventory) {
         log.info("POST /api/v1/inventory - producto {}", inventory.getProductId());
@@ -68,16 +70,16 @@ public class InventoryController {
                 nuevoInventario,
                 null);
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED); // 201 Created
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // ==========================================================
-    // 4. PUT - Actualizar Stock Existente
-    // ==========================================================
+    @Operation(summary = "Actualizar stock", description = "Incrementa o decrementa cantidad (delta)")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Stock actualizado")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Stock insuficiente")
     @PutMapping("/actualizar")
     public ResponseEntity<ApiResponse<Inventory>> actualizarStock(
-            @RequestParam Integer productId,
-            @RequestParam Integer cantidad) {
+            @Parameter(description = "ID del producto", example = "1") @RequestParam Integer productId,
+            @Parameter(description = "Cantidad a sumar o restar", example = "5") @RequestParam Integer cantidad) {
 
         log.info("PUT /api/v1/inventory/actualizar - producto {} cantidad {}", productId, cantidad);
         Inventory inventoryActualizado = inventoryService.actualizarStock(productId, cantidad);
@@ -91,11 +93,12 @@ public class InventoryController {
         return ResponseEntity.ok(response);
     }
 
-    // ==========================================================
-    // 5. DELETE - Eliminar Registro de Inventario
-    // ==========================================================
+    @Operation(summary = "Eliminar registro de inventario")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Registro eliminado")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Producto no encontrado en inventario")
     @DeleteMapping("/{productId}")
-    public ResponseEntity<ApiResponse<Void>> eliminarInventario(@PathVariable Integer productId) {
+    public ResponseEntity<ApiResponse<Void>> eliminarInventario(
+            @Parameter(description = "ID del producto") @PathVariable Integer productId) {
         log.info("DELETE /api/v1/inventory/{}", productId);
         inventoryService.eliminarInventarioPorProducto(productId);
 
