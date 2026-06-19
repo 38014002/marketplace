@@ -7,56 +7,56 @@ spring:
     gateway:
       routes:
         - id: ms-user
-          uri: lb://ms-user
+          uri: lb://MS-USER
           predicates:
             - Path=/api/usuarios/**
 
         - id: ms-producto
-          uri: lb://ms-producto
+          uri: lb://MS-PRODUCTO
           predicates:
             - Path=/api/productos/**
 
         - id: ms-order
-          uri: lb://ms-order
+          uri: lb://MS-ORDER
           predicates:
             - Path=/api/orders/**
 
         - id: ms-payment
-          uri: lb://ms-payment
+          uri: lb://MS-PAYMENT
           predicates:
             - Path=/api/payments/**
           filters:
             - RewritePath=/api/payments/(?<segment>.*), /api/pagos/${segment}
 
         - id: ms-notification
-          uri: lb://ms-notification
+          uri: lb://MS-NOTIFICATION
           predicates:
             - Path=/api/notifications/**
 
         - id: ms-search
-          uri: lb://ms-search
+          uri: lb://MS-SEARCH
           predicates:
             - Path=/api/search/**
 
         - id: ms-cart
-          uri: lb://ms-cart
+          uri: lb://MS-CART
           predicates:
             - Path=/api/cart/**
 
         - id: ms-catalog
-          uri: lb://ms-catalog
+          uri: lb://MS-CATALOG
           predicates:
             - Path=/api/catalog/**
           filters:
             - RewritePath=/api/catalog/(?<segment>.*), /api/v1/catalog/${segment}
 
         - id: ms-auth
-          uri: lb://ms-auth
+          uri: lb://MS-AUTH
           predicates:
             - Path=/auth/**
 
         - id: ms-inventory
-          uri: lb://ms-inventory
+          uri: lb://MS-INVENTORY
           predicates:
             - Path=/api/inventory/**
           filters:
