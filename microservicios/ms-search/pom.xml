@@ -95,6 +95,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.5.0</version>
@@ -154,6 +159,8 @@
                                     <element>CLASS</element>
                                     <includes>
                                         <include>**/*Service</include>
+                                        <include>**/*Controller</include>
+                                        <include>**/*Repository</include>
                                     </includes>
                                     <limits>
                                         <limit>

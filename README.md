@@ -131,11 +131,17 @@ El archivo `render.yaml` en la raíz del proyecto define servicios Docker para d
 
 ## Pruebas unitarias y cobertura
 
-Cada microservicio de negocio incluye pruebas con **JUnit + Mockito** (estructura Given–When–Then) y validación **JaCoCo ≥ 80%** en clases `*Service`.
+Cada microservicio de negocio incluye pruebas en **tres capas** con **JUnit 5 + Mockito** (estructura Given–When–Then) y validación **JaCoCo ≥ 80%** en clases `*Service`, `*Controller` y `*Repository`.
+
+| Capa | Técnica | Mockito |
+|------|---------|---------|
+| **Service** | `@ExtendWith(MockitoExtension.class)` + `@Mock` / `@InjectMocks` | Sí — dependencias simuladas con `when()` / `verify()` |
+| **Controller** | `@WebMvcTest` + `MockMvc` + `@MockBean` | Sí — `@MockBean` inyecta mocks Mockito del service (y `JwtUtil` si hay seguridad) |
+| **Repository** | `@DataJpaTest` + H2 en memoria | No — prueba real de persistencia y queries Spring Data |
 
 ```bash
 cd microservicios/ms-user
-./mvnw test
+./mvnw verify -Dtest="*ServiceTest,*ControllerTest,*RepositoryTest"
 ```
 
 Reporte de cobertura: `target/site/jacoco/index.html`

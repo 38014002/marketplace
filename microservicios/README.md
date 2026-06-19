@@ -11,12 +11,14 @@ docker compose up --build
 
 ## Tests por servicio
 
+Pruebas en **service**, **controller** y **repository** (Mockito en las dos primeras; H2 real en repository).
+
 ```bash
 cd ms-user
-./mvnw test
+./mvnw verify -Dtest="*ServiceTest,*ControllerTest,*RepositoryTest"
 ```
 
-Ver cobertura: `target/site/jacoco/index.html`
+Ver cobertura JaCoCo (≥ 80% en `*Service`, `*Controller`, `*Repository`): `target/site/jacoco/index.html`
 
 ## Estructura
 
