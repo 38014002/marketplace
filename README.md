@@ -133,7 +133,7 @@ Variables clave por entorno:
 | Variable | Local | Docker | Render |
 |----------|-------|--------|--------|
 | `SPRING_PROFILES_ACTIVE` | `dev` | `dev` | `prod` |
-| `DB_HOST` | `localhost` | `mysql` | host MySQL externo |
+| `DB_HOST` | `localhost` | `mysql-<servicio>` (ej. `mysql-user`) | host MySQL externo |
 | `EUREKA_HOST` | `localhost` | `ms-eureka` | vía `fromService` |
 | `JWT_SECRET` | `.env` | `.env` | auto-generado |
 
@@ -147,7 +147,8 @@ docker compose up --build
 
 - Gateway: http://localhost:8080
 - Eureka: http://localhost:8761
-- MySQL: puerto 3306
+- Base de datos: una instancia MySQL dedicada por microservicio (`mysql-user`, `mysql-order`, etc.)
+- Sin BD propia: `ms-producto` (fachada REST), `ms-gateway`, `ms-eureka`
 - Perfil activo: `dev` (definido en `docker-compose.yml`)
 
 ## Despliegue remoto (Render)

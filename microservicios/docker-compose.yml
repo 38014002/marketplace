@@ -1,21 +1,110 @@
 version: "3.9"
 
+x-mysql-healthcheck: &mysql-healthcheck
+  test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+  interval: 10s
+  timeout: 5s
+  retries: 5
+
 services:
-  mysql:
+  mysql-user:
     image: mysql:8.0
-    container_name: marketplace-mysql
+    container_name: mysql-user
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-}
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-    ports:
-      - "3306:3306"
+      MYSQL_DATABASE: ms_user
     volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - mysql_user_data:/var/lib/mysql
+    healthcheck: *mysql-healthcheck
+
+  mysql-order:
+    image: mysql:8.0
+    container_name: mysql-order
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: ms_order
+    volumes:
+      - mysql_order_data:/var/lib/mysql
+    healthcheck: *mysql-healthcheck
+
+  mysql-inventory:
+    image: mysql:8.0
+    container_name: mysql-inventory
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: ms_inventory
+    volumes:
+      - mysql_inventory_data:/var/lib/mysql
+    healthcheck: *mysql-healthcheck
+
+  mysql-catalog:
+    image: mysql:8.0
+    container_name: mysql-catalog
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: ms_catalog
+    volumes:
+      - mysql_catalog_data:/var/lib/mysql
+    healthcheck: *mysql-healthcheck
+
+  mysql-cart:
+    image: mysql:8.0
+    container_name: mysql-cart
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: ms_cart
+    volumes:
+      - mysql_cart_data:/var/lib/mysql
+    healthcheck: *mysql-healthcheck
+
+  mysql-auth:
+    image: mysql:8.0
+    container_name: mysql-auth
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: ms_auth
+    volumes:
+      - mysql_auth_data:/var/lib/mysql
+    healthcheck: *mysql-healthcheck
+
+  mysql-payment:
+    image: mysql:8.0
+    container_name: mysql-payment
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: ms_payment
+    volumes:
+      - mysql_payment_data:/var/lib/mysql
+    healthcheck: *mysql-healthcheck
+
+  mysql-search:
+    image: mysql:8.0
+    container_name: mysql-search
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: ms_search
+    volumes:
+      - mysql_search_data:/var/lib/mysql
+    healthcheck: *mysql-healthcheck
+
+  mysql-notification:
+    image: mysql:8.0
+    container_name: mysql-notification
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: ms_notification
+    volumes:
+      - mysql_notification_data:/var/lib/mysql
+    healthcheck: *mysql-healthcheck
 
   ms-eureka:
     build:
@@ -55,14 +144,14 @@ services:
       SERVER_PORT: 8081
       EUREKA_HOST: ms-eureka
       EUREKA_PORT: "8761"
-      DB_HOST: mysql
+      DB_HOST: mysql-user
       DB_PORT: "3306"
       DB_USER: root
       DB_NAME: ms_user
       DB_PASSWORD: ${DB_PASSWORD:-}
       JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
     depends_on:
-      mysql:
+      mysql-user:
         condition: service_healthy
       ms-eureka:
         condition: service_started
@@ -99,7 +188,7 @@ services:
       SERVER_PORT: 8083
       EUREKA_HOST: ms-eureka
       EUREKA_PORT: "8761"
-      DB_HOST: mysql
+      DB_HOST: mysql-order
       DB_PORT: "3306"
       DB_USER: root
       DB_NAME: ms_order
@@ -111,7 +200,7 @@ services:
       SERVICES_CATALOG_URL: http://ms-catalog:8085/api/v1/catalog
       SERVICES_NOTIFICATION_URL: http://ms-notification:8090/api/notifications
     depends_on:
-      mysql:
+      mysql-order:
         condition: service_healthy
       ms-eureka:
         condition: service_started
@@ -132,14 +221,14 @@ services:
       SERVER_PORT: 8084
       EUREKA_HOST: ms-eureka
       EUREKA_PORT: "8761"
-      DB_HOST: mysql
+      DB_HOST: mysql-inventory
       DB_PORT: "3306"
       DB_USER: root
       DB_NAME: ms_inventory
       DB_PASSWORD: ${DB_PASSWORD:-}
       JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
     depends_on:
-      mysql:
+      mysql-inventory:
         condition: service_healthy
       ms-eureka:
         condition: service_started
@@ -156,7 +245,7 @@ services:
       SERVER_PORT: 8085
       EUREKA_HOST: ms-eureka
       EUREKA_PORT: "8761"
-      DB_HOST: mysql
+      DB_HOST: mysql-catalog
       DB_PORT: "3306"
       DB_USER: root
       DB_NAME: ms_catalog
@@ -165,7 +254,7 @@ services:
       SERVICES_INVENTORY_URL: http://ms-inventory:8084/api/v1/inventory
       SERVICES_SEARCH_URL: http://ms-search:8089/api/search
     depends_on:
-      mysql:
+      mysql-catalog:
         condition: service_healthy
       ms-eureka:
         condition: service_started
@@ -182,14 +271,14 @@ services:
       SERVER_PORT: 8086
       EUREKA_HOST: ms-eureka
       EUREKA_PORT: "8761"
-      DB_HOST: mysql
+      DB_HOST: mysql-cart
       DB_PORT: "3306"
       DB_USER: root
       DB_NAME: ms_cart
       DB_PASSWORD: ${DB_PASSWORD:-}
       JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
     depends_on:
-      mysql:
+      mysql-cart:
         condition: service_healthy
       ms-eureka:
         condition: service_started
@@ -206,14 +295,14 @@ services:
       SERVER_PORT: 8087
       EUREKA_HOST: ms-eureka
       EUREKA_PORT: "8761"
-      DB_HOST: mysql
+      DB_HOST: mysql-auth
       DB_PORT: "3306"
       DB_USER: root
       DB_NAME: ms_auth
       DB_PASSWORD: ${DB_PASSWORD:-}
       JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
     depends_on:
-      mysql:
+      mysql-auth:
         condition: service_healthy
       ms-eureka:
         condition: service_started
@@ -230,14 +319,14 @@ services:
       SERVER_PORT: 8088
       EUREKA_HOST: ms-eureka
       EUREKA_PORT: "8761"
-      DB_HOST: mysql
+      DB_HOST: mysql-payment
       DB_PORT: "3306"
       DB_USER: root
       DB_NAME: ms_payment
       DB_PASSWORD: ${DB_PASSWORD:-}
       JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
     depends_on:
-      mysql:
+      mysql-payment:
         condition: service_healthy
       ms-eureka:
         condition: service_started
@@ -254,13 +343,13 @@ services:
       SERVER_PORT: 8089
       EUREKA_HOST: ms-eureka
       EUREKA_PORT: "8761"
-      DB_HOST: mysql
+      DB_HOST: mysql-search
       DB_PORT: "3306"
       DB_USER: root
       DB_NAME: ms_search
       DB_PASSWORD: ${DB_PASSWORD:-}
     depends_on:
-      mysql:
+      mysql-search:
         condition: service_healthy
       ms-eureka:
         condition: service_started
@@ -277,17 +366,25 @@ services:
       SERVER_PORT: 8090
       EUREKA_HOST: ms-eureka
       EUREKA_PORT: "8761"
-      DB_HOST: mysql
+      DB_HOST: mysql-notification
       DB_PORT: "3306"
       DB_USER: root
       DB_NAME: ms_notification
       DB_PASSWORD: ${DB_PASSWORD:-}
       JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
     depends_on:
-      mysql:
+      mysql-notification:
         condition: service_healthy
       ms-eureka:
         condition: service_started
 
 volumes:
-  mysql_data:
+  mysql_user_data:
+  mysql_order_data:
+  mysql_inventory_data:
+  mysql_catalog_data:
+  mysql_cart_data:
+  mysql_auth_data:
+  mysql_payment_data:
+  mysql_search_data:
+  mysql_notification_data:
