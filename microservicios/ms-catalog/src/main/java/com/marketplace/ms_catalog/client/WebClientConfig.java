@@ -16,7 +16,7 @@ public class WebClientConfig {
 
     @Bean
     public WebClient inventoryWebClient(
-            @Value("${services.inventory.url:http://localhost:8084/api/v1/inventory}") String baseUrl) {
+            @Value("${services.inventory.url:http://localhost:8084/api/inventory}") String baseUrl) {
         return WebClient.builder().baseUrl(baseUrl).build();
     }
 }

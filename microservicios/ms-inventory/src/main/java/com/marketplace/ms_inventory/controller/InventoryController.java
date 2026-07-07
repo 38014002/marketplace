@@ -17,7 +17,7 @@ import java.util.List;
 
 @Tag(name = "Inventario", description = "Consulta y gestión de stock por producto")
 @RestController
-@RequestMapping("/api/v1/inventory")
+@RequestMapping("/api/inventory")
 @RequiredArgsConstructor
 @Slf4j
 public class InventoryController {
@@ -61,7 +61,7 @@ public class InventoryController {
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Producto ya registrado")
     @PostMapping
     public ResponseEntity<ApiResponse<Inventory>> crearInventario(@RequestBody Inventory inventory) {
-        log.info("POST /api/v1/inventory - producto {}", inventory.getProductId());
+        log.info("POST /api/inventory - producto {}", inventory.getProductId());
         Inventory nuevoInventario = inventoryService.crearInventario(inventory);
 
         ApiResponse<Inventory> response = new ApiResponse<>(
@@ -81,7 +81,7 @@ public class InventoryController {
             @Parameter(description = "ID del producto", example = "1") @RequestParam Integer productId,
             @Parameter(description = "Cantidad a sumar o restar", example = "5") @RequestParam Integer cantidad) {
 
-        log.info("PUT /api/v1/inventory/actualizar - producto {} cantidad {}", productId, cantidad);
+        log.info("PUT /api/inventory/actualizar - producto {} cantidad {}", productId, cantidad);
         Inventory inventoryActualizado = inventoryService.actualizarStock(productId, cantidad);
 
         ApiResponse<Inventory> response = new ApiResponse<>(
@@ -99,7 +99,7 @@ public class InventoryController {
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse<Void>> eliminarInventario(
             @Parameter(description = "ID del producto") @PathVariable Integer productId) {
-        log.info("DELETE /api/v1/inventory/{}", productId);
+        log.info("DELETE /api/inventory/{}", productId);
         inventoryService.eliminarInventarioPorProducto(productId);
 
         ApiResponse<Void> response = new ApiResponse<>(

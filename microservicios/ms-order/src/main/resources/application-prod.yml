@@ -17,8 +17,8 @@ services:
   payment:
     url: ${SERVICES_PAYMENT_URL:http://ms-payment:8088/api/pagos}
   inventory:
-    url: ${SERVICES_INVENTORY_URL:http://ms-inventory:8084/api/v1/inventory}
+    url: ${SERVICES_INVENTORY_URL:http://ms-inventory:8084/api/inventory}
   catalog:
-    url: ${SERVICES_CATALOG_URL:http://ms-catalog:8085/api/v1/catalog}
+    url: ${SERVICES_CATALOG_URL:http://ms-catalog:8085/api/catalog}
   notification:
     url: ${SERVICES_NOTIFICATION_URL:http://ms-notification:8090/api/notifications}

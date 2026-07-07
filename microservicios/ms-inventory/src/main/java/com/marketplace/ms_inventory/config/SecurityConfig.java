@@ -27,13 +27,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 1. CORREGIDO: Permitir ver el stock general o por ID a todo el mundo (Ruta
                         // v1)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/inventory/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/inventory/**").permitAll()
 
                         // 2. CORREGIDO: Rutas de mutación (POST, PUT, DELETE) exclusivas para
                         // Administradores
-                        .requestMatchers(HttpMethod.POST, "/api/v1/inventory/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/inventory/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/inventory/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/inventory/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/inventory/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/inventory/**").hasRole("ADMIN")
 
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 

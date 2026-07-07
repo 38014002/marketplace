@@ -169,8 +169,8 @@ services:
       EUREKA_HOST: ms-eureka
       EUREKA_PORT: "8761"
       JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
-      SERVICES_CATALOG_URL: http://ms-catalog:8085/api/v1/catalog
-      SERVICES_INVENTORY_URL: http://ms-inventory:8084/api/v1/inventory
+      SERVICES_CATALOG_URL: http://ms-catalog:8085/api/catalog
+      SERVICES_INVENTORY_URL: http://ms-inventory:8084/api/inventory
     depends_on:
       - ms-eureka
       - ms-catalog
@@ -196,8 +196,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
       SERVICES_CART_URL: http://ms-cart:8086/api/cart
       SERVICES_PAYMENT_URL: http://ms-payment:8088/api/pagos
-      SERVICES_INVENTORY_URL: http://ms-inventory:8084/api/v1/inventory
-      SERVICES_CATALOG_URL: http://ms-catalog:8085/api/v1/catalog
+      SERVICES_INVENTORY_URL: http://ms-inventory:8084/api/inventory
+      SERVICES_CATALOG_URL: http://ms-catalog:8085/api/catalog
       SERVICES_NOTIFICATION_URL: http://ms-notification:8090/api/notifications
     depends_on:
       mysql-order:
@@ -251,7 +251,7 @@ services:
       DB_NAME: ms_catalog
       DB_PASSWORD: ${DB_PASSWORD:-}
       JWT_SECRET: ${JWT_SECRET:-esta_es_una_clave_secreta_muy_larga_y_segura_1234567890}
-      SERVICES_INVENTORY_URL: http://ms-inventory:8084/api/v1/inventory
+      SERVICES_INVENTORY_URL: http://ms-inventory:8084/api/inventory
       SERVICES_SEARCH_URL: http://ms-search:8089/api/search
     depends_on:
       mysql-catalog:

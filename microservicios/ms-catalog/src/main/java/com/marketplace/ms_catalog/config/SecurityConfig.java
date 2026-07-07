@@ -32,12 +32,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // 1. CUALQUIERA puede ver el catálogo (Ruta pública para el cliente)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/catalog/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/catalog/**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/api/v1/catalog/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/catalog/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/catalog/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/catalog/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/catalog/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/catalog/**").hasRole("ADMIN")
 
                         // 3. Cualquier otra cosa requiere autenticación
                         .anyRequest().authenticated())

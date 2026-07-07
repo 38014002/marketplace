@@ -44,7 +44,7 @@ spring:
         - id: ms-catalog
           uri: lb://MS-CATALOG
           predicates:
-            - Path=/api/v1/catalog/**
+            - Path=/api/catalog/**
 
         - id: ms-auth
           uri: lb://MS-AUTH
@@ -54,7 +54,7 @@ spring:
         - id: ms-inventory
           uri: lb://MS-INVENTORY
           predicates:
-            - Path=/api/v1/inventory/**
+            - Path=/api/inventory/**
 
 server:
   port: ${SERVER_PORT:8080}

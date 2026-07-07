@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Tag(name = "Catálogo", description = "Gestión del catálogo de productos y consulta con stock")
 @RestController
-@RequestMapping("/api/v1/catalog")
+@RequestMapping("/api/catalog")
 @RequiredArgsConstructor
 @Slf4j
 public class ProductController {
@@ -49,7 +49,7 @@ public class ProductController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Product> crear(@Valid @RequestBody ProductRequestDTO dto) {
-        log.info("POST /api/v1/catalog - crear producto {}", dto.getName());
+        log.info("POST /api/catalog - crear producto {}", dto.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.crearProducto(dto));
     }
 
@@ -61,7 +61,7 @@ public class ProductController {
     public ResponseEntity<Product> actualizar(
             @Parameter(description = "ID del producto") @PathVariable Long id,
             @Valid @RequestBody ProductRequestDTO dto) {
-        log.info("PUT /api/v1/catalog/{} - actualizar producto", id);
+        log.info("PUT /api/catalog/{} - actualizar producto", id);
         return ResponseEntity.ok(productService.actualizarProducto(id, dto));
     }
 
@@ -71,7 +71,7 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(
             @Parameter(description = "ID del producto") @PathVariable Long id) {
-        log.info("DELETE /api/v1/catalog/{} - eliminar producto", id);
+        log.info("DELETE /api/catalog/{} - eliminar producto", id);
         productService.eliminarProducto(id);
         return ResponseEntity.noContent().build();
     }

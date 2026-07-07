@@ -63,8 +63,8 @@ Comunicación entre microservicios: **WebClient**. Registro de servicios: **Eure
 | `/api/orders/**` | ms-order | `/api/orders` |
 | `/api/cart/**` | ms-cart | `/api/cart` |
 | `/api/pagos/**` | ms-payment | `/api/pagos` |
-| `/api/v1/catalog/**` | ms-catalog | `/api/v1/catalog` |
-| `/api/v1/inventory/**` | ms-inventory | `/api/v1/inventory` |
+| `/api/catalog/**` | ms-catalog | `/api/catalog` |
+| `/api/inventory/**` | ms-inventory | `/api/inventory` |
 | `/api/search/**` | ms-search | `/api/search` |
 | `/api/notifications/**` | ms-notification | `/api/notifications` |
 | `/auth/**` | ms-auth | `/auth` |

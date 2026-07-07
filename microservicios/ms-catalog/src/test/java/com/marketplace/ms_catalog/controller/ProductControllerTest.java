@@ -47,7 +47,7 @@ class ProductControllerTest {
         when(productService.listarTodos()).thenReturn(List.of(product));
 
         // When / Then
-        mockMvc.perform(get("/api/v1/catalog"))
+        mockMvc.perform(get("/api/catalog"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Mouse"));
     }
@@ -67,7 +67,7 @@ class ProductControllerTest {
         when(productService.crearProducto(any())).thenReturn(created);
 
         // When / Then
-        mockMvc.perform(post("/api/v1/catalog")
+        mockMvc.perform(post("/api/catalog")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
@@ -85,7 +85,7 @@ class ProductControllerTest {
                         .build());
 
         // When / Then
-        mockMvc.perform(get("/api/v1/catalog/1"))
+        mockMvc.perform(get("/api/catalog/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.name").value("Mouse"));
     }
@@ -103,7 +103,7 @@ class ProductControllerTest {
         updated.setName("Actualizado");
         when(productService.actualizarProducto(eq(1L), any())).thenReturn(updated);
 
-        mockMvc.perform(put("/api/v1/catalog/1")
+        mockMvc.perform(put("/api/catalog/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -112,7 +112,7 @@ class ProductControllerTest {
 
     @Test
     void eliminar_debeRetornar204() throws Exception {
-        mockMvc.perform(delete("/api/v1/catalog/1"))
+        mockMvc.perform(delete("/api/catalog/1"))
                 .andExpect(status().isNoContent());
     }
 }

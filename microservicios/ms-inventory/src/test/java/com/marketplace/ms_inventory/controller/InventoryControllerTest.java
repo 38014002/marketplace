@@ -38,7 +38,7 @@ class InventoryControllerTest {
                 Inventory.builder().productId(1).stock(10).build()));
 
         // When / Then
-        mockMvc.perform(get("/api/v1/inventory"))
+        mockMvc.perform(get("/api/inventory"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data[0].stock").value(10));
@@ -50,7 +50,7 @@ class InventoryControllerTest {
         when(inventoryService.consultarStock(1)).thenReturn(15);
 
         // When / Then
-        mockMvc.perform(get("/api/v1/inventory/1"))
+        mockMvc.perform(get("/api/inventory/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.stock").value(15));
     }
@@ -62,7 +62,7 @@ class InventoryControllerTest {
                 Inventory.builder().id(1L).productId(2).stock(5).build());
 
         // When / Then
-        mockMvc.perform(post("/api/v1/inventory")
+        mockMvc.perform(post("/api/inventory")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"productId\":2,\"stock\":5}"))
                 .andExpect(status().isCreated())
@@ -74,7 +74,7 @@ class InventoryControllerTest {
         when(inventoryService.actualizarStock(1, 5)).thenReturn(
                 Inventory.builder().productId(1).stock(15).build());
 
-        mockMvc.perform(put("/api/v1/inventory/actualizar")
+        mockMvc.perform(put("/api/inventory/actualizar")
                         .param("productId", "1")
                         .param("cantidad", "5"))
                 .andExpect(status().isOk())
@@ -83,7 +83,7 @@ class InventoryControllerTest {
 
     @Test
     void eliminarInventario_debeRetornar200() throws Exception {
-        mockMvc.perform(delete("/api/v1/inventory/1"))
+        mockMvc.perform(delete("/api/inventory/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }

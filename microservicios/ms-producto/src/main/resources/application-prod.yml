@@ -4,9 +4,9 @@ eureka:
 
 services:
   catalog:
-    url: ${SERVICES_CATALOG_URL:http://ms-catalog:8085/api/v1/catalog}
+    url: ${SERVICES_CATALOG_URL:http://ms-catalog:8085/api/catalog}
   inventory:
-    url: ${SERVICES_INVENTORY_URL:http://ms-inventory:8084/api/v1/inventory}
+    url: ${SERVICES_INVENTORY_URL:http://ms-inventory:8084/api/inventory}
 
 logging:
   level:

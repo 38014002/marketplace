@@ -125,7 +125,7 @@ services:
       - key: DB_NAME
         value: ms_catalog
       - key: SERVICES_INVENTORY_URL
-        value: http://marketplace-ms-inventory:8084/api/v1/inventory
+        value: http://marketplace-ms-inventory:8084/api/inventory
       - key: SERVICES_SEARCH_URL
         value: http://marketplace-ms-search:8089/api/search
       - key: EUREKA_HOST
@@ -175,9 +175,9 @@ services:
       - key: SERVER_PORT
         value: 8082
       - key: SERVICES_CATALOG_URL
-        value: http://marketplace-ms-catalog:8085/api/v1/catalog
+        value: http://marketplace-ms-catalog:8085/api/catalog
       - key: SERVICES_INVENTORY_URL
-        value: http://marketplace-ms-inventory:8084/api/v1/inventory
+        value: http://marketplace-ms-inventory:8084/api/inventory
       - key: EUREKA_HOST
         fromService:
           type: pserv
@@ -279,9 +279,9 @@ services:
       - key: SERVICES_PAYMENT_URL
         value: http://marketplace-ms-payment:8088/api/pagos
       - key: SERVICES_INVENTORY_URL
-        value: http://marketplace-ms-inventory:8084/api/v1/inventory
+        value: http://marketplace-ms-inventory:8084/api/inventory
       - key: SERVICES_CATALOG_URL
-        value: http://marketplace-ms-catalog:8085/api/v1/catalog
+        value: http://marketplace-ms-catalog:8085/api/catalog
       - key: SERVICES_NOTIFICATION_URL
         value: http://marketplace-ms-notification:8090/api/notifications
       - key: EUREKA_HOST
