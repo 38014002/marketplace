@@ -24,9 +24,7 @@ spring:
         - id: ms-payment
           uri: lb://MS-PAYMENT
           predicates:
-            - Path=/api/payments/**
-          filters:
-            - RewritePath=/api/payments/(?<segment>.*), /api/pagos/${segment}
+            - Path=/api/pagos/**
 
         - id: ms-notification
           uri: lb://MS-NOTIFICATION
@@ -46,9 +44,7 @@ spring:
         - id: ms-catalog
           uri: lb://MS-CATALOG
           predicates:
-            - Path=/api/catalog/**
-          filters:
-            - RewritePath=/api/catalog/(?<segment>.*), /api/v1/catalog/${segment}
+            - Path=/api/v1/catalog/**
 
         - id: ms-auth
           uri: lb://MS-AUTH
@@ -58,9 +54,7 @@ spring:
         - id: ms-inventory
           uri: lb://MS-INVENTORY
           predicates:
-            - Path=/api/inventory/**
-          filters:
-            - RewritePath=/api/inventory/(?<segment>.*), /api/v1/inventory/${segment}
+            - Path=/api/v1/inventory/**
 
 server:
   port: ${SERVER_PORT:8080}

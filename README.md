@@ -56,18 +56,18 @@ Comunicación entre microservicios: **WebClient**. Registro de servicios: **Eure
 
 ## Rutas del API Gateway (`http://localhost:8080`)
 
-| Ruta gateway | Microservicio |
-|--------------|---------------|
-| `/api/usuarios/**` | ms-user |
-| `/api/productos/**` | ms-producto |
-| `/api/orders/**` | ms-order |
-| `/api/cart/**` | ms-cart |
-| `/api/payments/**` | ms-payment (rewrite → `/api/pagos`) |
-| `/api/catalog/**` | ms-catalog (rewrite → `/api/v1/catalog`) |
-| `/api/inventory/**` | ms-inventory (rewrite → `/api/v1/inventory`) |
-| `/api/search/**` | ms-search |
-| `/api/notifications/**` | ms-notification |
-| `/auth/**` | ms-auth |
+| Ruta gateway | Microservicio | Controller |
+|--------------|---------------|------------|
+| `/api/usuarios/**` | ms-user | `/api/usuarios` |
+| `/api/productos/**` | ms-producto | `/api/productos` |
+| `/api/orders/**` | ms-order | `/api/orders` |
+| `/api/cart/**` | ms-cart | `/api/cart` |
+| `/api/pagos/**` | ms-payment | `/api/pagos` |
+| `/api/v1/catalog/**` | ms-catalog | `/api/v1/catalog` |
+| `/api/v1/inventory/**` | ms-inventory | `/api/v1/inventory` |
+| `/api/search/**` | ms-search | `/api/search` |
+| `/api/notifications/**` | ms-notification | `/api/notifications` |
+| `/auth/**` | ms-auth | `/auth` |
 
 ## Documentación Swagger (local)
 
