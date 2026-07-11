@@ -1,16 +1,18 @@
 package com.marketplace.ms_order.controller;
 
 import com.marketplace.ms_order.dto.ApiResponse;
+import com.marketplace.ms_order.dto.OrderRequest;
+import com.marketplace.ms_order.dto.OrderUpdateRequest;
 import com.marketplace.ms_order.model.Order;
 import com.marketplace.ms_order.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
@@ -23,12 +25,17 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    // 1. CREAR ÓRDEN - ACCESO: USUARIOS AUTENTICADOS
     @Operation(summary = "Crear una nueva orden manualmente")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Orden registrada con éxito")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Datos de entrada inválidos")
     @PostMapping
-    public ResponseEntity<ApiResponse<Order>> createOrder(@RequestBody Order order) {
+    public ResponseEntity<ApiResponse<Order>> createOrder(@Valid @RequestBody OrderRequest request) {
         log.info("Petición para crear una nueva orden");
+        Order order = Order.builder()
+                .userId(request.getUserId())
+                .productIds(request.getProductIds())
+                .totalAmount(request.getTotalAmount())
+                .build();
         Order nuevaOrden = orderService.saveOrder(order);
         return ResponseEntity.ok(ApiResponse.<Order>builder()
                 .success(true)
@@ -37,7 +44,6 @@ public class OrderController {
                 .build());
     }
 
-    // 2. LISTAR TODAS LAS ÓRDENES - RESTRINGIDO: SOLO ADMIN
     @Operation(summary = "Listar todas las órdenes del sistema (Solo ADMIN)")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Listado de órdenes obtenido correctamente")
     @GetMapping
@@ -52,7 +58,6 @@ public class OrderController {
                 .build());
     }
 
-    // 3. OBTENER ÓRDENES POR USUARIO - ACCESO: USUARIOS AUTENTICADOS
     @Operation(summary = "Obtener el historial de órdenes de un usuario")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Órdenes del usuario obtenidas correctamente")
     @GetMapping("/user/{userId}")
@@ -66,7 +71,6 @@ public class OrderController {
                 .build());
     }
 
-    // 4. PROCESAR CHECKOUT - ACCESO: USUARIOS AUTENTICADOS
     @Operation(summary = "Procesar el checkout del carrito actual de un usuario")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Checkout procesado y orden generada")
     @PostMapping("/checkout/{userId}")
@@ -80,16 +84,22 @@ public class OrderController {
                 .build());
     }
 
-    // 5. ACTUALIZAR ÓRDEN - RESTRINGIDO: SOLO ADMIN
     @Operation(summary = "Actualizar una orden existente (Solo ADMIN)")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Orden actualizada con éxito")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Datos de entrada inválidos")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Order>> updateOrder(
             @PathVariable Long id,
-            @RequestBody Order orderDetails) {
+            @Valid @RequestBody OrderUpdateRequest request) {
         log.info("Petición para actualizar la orden con ID: {} - Operación protegida para ADMIN", id);
 
+        Order orderDetails = Order.builder()
+                .userId(request.getUserId())
+                .status(request.getStatus())
+                .totalAmount(request.getTotalAmount())
+                .productIds(request.getProductIds())
+                .build();
         Order ordenActualizada = orderService.updateOrder(id, orderDetails);
 
         return ResponseEntity.ok(ApiResponse.<Order>builder()
@@ -99,7 +109,6 @@ public class OrderController {
                 .build());
     }
 
-    // 6. ELIMINAR ÓRDEN - RESTRINGIDO: SOLO ADMIN
     @Operation(summary = "Eliminar una orden por su ID (Solo ADMIN)")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Orden eliminada con éxito")
     @DeleteMapping("/{id}")

@@ -1,16 +1,21 @@
 package com.marketplace.ms_inventory.controller;
 
 import com.marketplace.ms_inventory.dto.ApiResponse;
+import com.marketplace.ms_inventory.dto.InventoryRequestDTO;
 import com.marketplace.ms_inventory.dto.StockResponse;
 import com.marketplace.ms_inventory.model.Inventory;
 import com.marketplace.ms_inventory.service.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/inventory")
 @RequiredArgsConstructor
+@Validated
 @Slf4j
 public class InventoryController {
 
@@ -58,10 +64,15 @@ public class InventoryController {
 
     @Operation(summary = "Registrar inventario", description = "Crea stock inicial para un producto")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Inventario creado")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Datos inválidos")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Producto ya registrado")
     @PostMapping
-    public ResponseEntity<ApiResponse<Inventory>> crearInventario(@RequestBody Inventory inventory) {
-        log.info("POST /api/inventory - producto {}", inventory.getProductId());
+    public ResponseEntity<ApiResponse<Inventory>> crearInventario(@Valid @RequestBody InventoryRequestDTO request) {
+        log.info("POST /api/inventory - producto {}", request.getProductId());
+        Inventory inventory = Inventory.builder()
+                .productId(request.getProductId())
+                .stock(request.getStock())
+                .build();
         Inventory nuevoInventario = inventoryService.crearInventario(inventory);
 
         ApiResponse<Inventory> response = new ApiResponse<>(
@@ -75,11 +86,13 @@ public class InventoryController {
 
     @Operation(summary = "Actualizar stock", description = "Incrementa o decrementa cantidad (delta)")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Stock actualizado")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Stock insuficiente")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Stock insuficiente o parámetros inválidos")
     @PutMapping("/actualizar")
     public ResponseEntity<ApiResponse<Inventory>> actualizarStock(
-            @Parameter(description = "ID del producto", example = "1") @RequestParam Integer productId,
-            @Parameter(description = "Cantidad a sumar o restar", example = "5") @RequestParam Integer cantidad) {
+            @Parameter(description = "ID del producto", example = "1")
+            @RequestParam @NotNull(message = "productId es obligatorio") @Positive(message = "productId debe ser positivo") Integer productId,
+            @Parameter(description = "Cantidad a sumar o restar", example = "5")
+            @RequestParam @NotNull(message = "cantidad es obligatoria") Integer cantidad) {
 
         log.info("PUT /api/inventory/actualizar - producto {} cantidad {}", productId, cantidad);
         Inventory inventoryActualizado = inventoryService.actualizarStock(productId, cantidad);

@@ -1,17 +1,19 @@
 package com.marketplace.ms_inventory.exception;
 
 import com.marketplace.ms_inventory.dto.ApiResponse;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 🔴 VALIDACIÓN: Errores en los datos enviados
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Object>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> errores = new HashMap<>();
@@ -27,7 +29,20 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-    // 🔎 404: Cuando buscas un producto que no está registrado en inventario
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleConstraint(ConstraintViolationException ex) {
+        Map<String, String> errores = new HashMap<>();
+        ex.getConstraintViolations().forEach(v ->
+                errores.put(v.getPropertyPath().toString(), v.getMessage()));
+
+        return ResponseEntity.badRequest().body(
+                ApiResponse.<Object>builder()
+                        .success(false)
+                        .message("Parámetros inválidos en Inventario")
+                        .error(errores)
+                        .build());
+    }
+
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<ApiResponse<Object>> handleNotFound(RecursoNoEncontradoException ex) {
         return ResponseEntity.status(404).body(
@@ -37,7 +52,6 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-    // 💥 500: Errores generales
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneral(Exception ex) {
         return ResponseEntity.status(500).body(
