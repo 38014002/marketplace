@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MsGatewayApplication",
+            "request": "launch",
+            "mainClass": "com.marketplace.ms_gateway.MsGatewayApplication",
+            "projectName": "ms-gateway"
+        },
+        {
+            "type": "java",
             "name": "ProductServiceApplication",
             "request": "launch",
             "mainClass": "com.marketplace.product_service.ProductServiceApplication",
